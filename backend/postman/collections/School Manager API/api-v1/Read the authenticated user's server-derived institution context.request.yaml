@@ -1,0 +1,13 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/v1/tenant-context"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Read the authenticated user's server-derived institution context.resources/examples
+order: 3000

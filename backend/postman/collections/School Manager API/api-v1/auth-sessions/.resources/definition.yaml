@@ -1,0 +1,3 @@
+$kind: collection
+name: auth/sessions
+order: 2000

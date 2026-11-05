@@ -1,0 +1,5 @@
+$kind: collection
+description: Foundation contract for opaque, rotating mobile API sessions and server-derived tenant context.
+variables:
+  baseUrl: /
+  bearerToken: ""

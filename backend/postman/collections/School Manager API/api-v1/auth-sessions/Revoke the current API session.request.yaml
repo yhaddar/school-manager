@@ -1,0 +1,11 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/v1/auth/sessions/current"
+method: DELETE
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearerToken}}"
+settings: {}
+examples: ./.resources/Revoke the current API session.resources/examples
+order: 3000

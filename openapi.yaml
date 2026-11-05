@@ -1,0 +1,124 @@
+openapi: 3.1.0
+info:
+  title: School Manager API
+  version: 0.1.0
+  description: Foundation contract for opaque, rotating mobile API sessions and server-derived tenant context.
+paths:
+  /api/v1/health:
+    get:
+      summary: Read service health
+      responses:
+        '200':
+          description: Service is available
+  /api/v1/auth/sessions:
+    post:
+      summary: Create an API session with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '201':
+          description: Session tokens issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '422':
+          description: Invalid credentials or request validation failure
+        '429':
+          description: Login attempts are throttled
+  /api/v1/auth/sessions/refresh:
+    post:
+      summary: Rotate an API session refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: Replacement session tokens issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Refresh token is invalid, expired, revoked, or reused
+  /api/v1/auth/sessions/current:
+    delete:
+      summary: Revoke the current API session
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Session revoked
+        '401':
+          description: Missing, expired, or revoked access token
+  /api/v1/tenant-context:
+    get:
+      summary: Read the authenticated user's server-derived institution context
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Active institution context
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [institution_id]
+                    properties:
+                      institution_id:
+                        type: string
+                        format: ulid
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: No active authorized membership
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+  schemas:
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    TokenResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [access_token, refresh_token, access_expires_at, refresh_expires_at]
+          properties:
+            access_token:
+              type: string
+            refresh_token:
+              type: string
+            access_expires_at:
+              type: string
+              format: date-time
+            refresh_expires_at:
+              type: string
+              format: date-time
