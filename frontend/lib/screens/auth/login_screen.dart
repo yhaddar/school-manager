@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
+import '../../main.dart'; // For AppTheme and AppTextTheme
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -43,35 +44,50 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (response.success) {
-      // Navigate to home - the router will redirect based on role
       context.go('/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response.message ?? 'Login failed')),
-      );
+      SnackBar(content: Text(response.message ?? 'Login failed')),
+    );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('School Manager'),
-      ),
+      backgroundColor: AppTheme.canvas,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(AppTheme.space16),
           child: Form(
             key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Spacer(),
+                // Logo/Title
+                const Icon(
+                  Icons.school,
+                  size: 64,
+                  color: AppTheme.primary,
+                ),
+                const SizedBox(height: AppTheme.space24),
+                Text(
+                  'School Manager',
+                  style: AppTextTheme.display.copyWith(
+                    color: AppTheme.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppTheme.space48),
+                
+                // Email field
                 TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(
                     labelText: 'Email',
                     prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
@@ -86,12 +102,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
+                
+                // Password field
                 TextFormField(
                   controller: _passwordController,
                   decoration: const InputDecoration(
                     labelText: 'Password',
                     prefixIcon: Icon(Icons.lock),
+                    border: OutlineInputBorder(),
                   ),
                   obscureText: true,
                   autofillHints: const [AutofillHints.password],
@@ -103,26 +122,33 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppTheme.space24),
+                
+                // Login button
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: AppTheme.onPrimary,
+                    ),
                     child: _isLoading
                         ? const CircularProgressIndicator()
                         : const Text('Login'),
                   ),
                 ),
+                
+                // Error message
                 if (Provider.of<AuthProvider>(context, listen: false).errorMessage != null)
                   Padding(
-                    padding: const EdgeInsets.only(top: 16),
+                    padding: const EdgeInsets.only(top: AppTheme.space16),
                     child: Text(
                       Provider.of<AuthProvider>(context, listen: false).errorMessage!,
                       style: TextStyle(color: Theme.of(context).colorScheme.error),
                     ),
                   ),
-                const Spacer(),
               ],
             ),
           ),

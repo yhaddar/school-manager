@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
+
 class ProfessorHomeScreen extends StatelessWidget {
   const ProfessorHomeScreen({super.key});
 
@@ -46,8 +48,54 @@ class ProfessorHomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: Text('Today content'),
+      body: const ProfessorTodayView(),
+    );
+  }
+}
+
+class ProfessorTodayView extends StatelessWidget {
+  const ProfessorTodayView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppTheme.space16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Good morning, Professor',
+              style: AppTextTheme.h1.copyWith(color: AppTheme.onSurface),
+            ),
+            const SizedBox(height: AppTheme.space16),
+            
+            const Text(
+              'Your schedule for today:',
+              style: AppTextTheme.title,
+            ),
+            const SizedBox(height: AppTheme.space16),
+            
+            Card(
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  return const ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: AppTheme.primary,
+                      child: Icon(Icons.book, color: AppTheme.onPrimary),
+                    ),
+                    title: Text('Mathematics'),
+                    subtitle: Text('Room 201 • 09:00 - 10:30'),
+                    trailing: Icon(Icons.access_time),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
