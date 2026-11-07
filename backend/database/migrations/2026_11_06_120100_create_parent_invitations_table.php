@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('parent_invitations', function (Blueprint $table): void {
+            $table->ulid('id')->primary();
+            $table->foreignUlid('institution_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('issued_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('code_hash', 64);
+            $table->timestamp('expires_at');
+            $table->timestamp('accepted_at')->nullable();
+            $table->timestamp('revoked_at')->nullable();
+            $table->string('ip_address', 45)->nullable();
+            $table->string('user_agent', 1024)->nullable();
+            $table->timestamps();
+
+            $table->unique(['institution_id', 'student_id']);
+            $table->index(['institution_id', 'expires_at']);
+            $table->index('expires_at');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('parent_invitations');
+    }
+};

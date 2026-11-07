@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: School Manager API
   version: 0.1.0
-  description: Foundation contract for opaque, rotating mobile API sessions and server-derived tenant context.
+  description: Foundation contract for account activation, opaque rotating mobile API sessions, and server-derived tenant context.
 paths:
   /api/v1/health:
     get:
@@ -30,6 +30,26 @@ paths:
           description: Invalid credentials or request validation failure
         '429':
           description: Login attempts are throttled
+  /api/v1/auth/activation:
+    post:
+      summary: Activate a staff or student account with its temporary credential
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountActivationRequest'
+      responses:
+        '201':
+          description: Account activated and session tokens issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '422':
+          description: Activation credential is invalid, expired, used, or the new password is invalid
+        '429':
+          description: Activation attempts are throttled
   /api/v1/auth/sessions/refresh:
     post:
       summary: Rotate an API session refresh token
@@ -87,6 +107,35 @@ paths:
           description: Missing, expired, or revoked access token
         '403':
           description: No active authorized membership
+  /api/v1/management/courses/{course}/teacher:
+    post:
+      summary: Assign a teacher to a course
+      description: Only institution administrators can assign teachers to courses.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: course
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseTeacherAssignmentRequest'
+      responses:
+        '200':
+          description: Teacher assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseTeacherAssignmentResponse'
+        '403':
+          description: Forbidden - user lacks administrator privileges
+        '404':
+          description: Course or teacher not found
 components:
   securitySchemes:
     bearerAuth:
@@ -102,6 +151,22 @@ components:
           type: string
           format: email
         password:
+          type: string
+          format: password
+    AccountActivationRequest:
+      type: object
+      required: [username, temporary_password, password, password_confirmation]
+      properties:
+        username:
+          type: string
+        temporary_password:
+          type: string
+          format: password
+        password:
+          type: string
+          format: password
+          description: At least 12 characters with mixed case, a number, and a symbol.
+        password_confirmation:
           type: string
           format: password
     TokenResponse:
@@ -122,3 +187,27 @@ components:
             refresh_expires_at:
               type: string
               format: date-time
+    CourseTeacherAssignmentRequest:
+      type: object
+      required: [teacher_id]
+      properties:
+        teacher_id:
+          type: integer
+          description: The user ID of the teacher to assign
+    CourseTeacherAssignmentResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, teacher_id, teacher_name]
+          properties:
+            id:
+              type: integer
+              description: Course ID
+            teacher_id:
+              type: integer
+              description: Assigned teacher's user ID
+            teacher_name:
+              type: string
+              description: Teacher's name

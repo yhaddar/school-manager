@@ -27,7 +27,7 @@ class AuthSessionController extends Controller
 
         $user = User::query()->where('email', $email)->first();
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+        if (! $user || ! $user->is_active || ! Hash::check($credentials['password'], $user->password)) {
             RateLimiter::hit($key, 60);
 
             return response()->json(['message' => 'Invalid credentials.'], 422);

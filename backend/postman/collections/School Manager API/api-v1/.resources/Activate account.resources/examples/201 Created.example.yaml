@@ -1,0 +1,23 @@
+$kind: http-example
+name: 201 Created
+request:
+  method: POST
+  url: '{{baseUrl}}/api/v1/auth/activation'
+  headers:
+    - key: Content-Type
+      value: application/json
+  body:
+    type: json
+    content: |-
+      {"username":"student.1001","temporary_password":"replace-with-temporary-password","password":"Personal#1001","password_confirmation":"Personal#1001"}
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    - key: Content-Type
+      value: application/json
+  body:
+    type: json
+    content: |-
+      {"data":{"access_token":"01H...access-secret","refresh_token":"01H...refresh-secret","access_expires_at":"2026-11-06T12:00:00+00:00","refresh_expires_at":"2026-12-06T12:00:00+00:00"}}
+order: 1000

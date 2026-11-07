@@ -16,6 +16,10 @@ class Institution extends Model
 
     public $incrementing = false;
 
+    protected $attributes = [
+        'status' => 'active',
+    ];
+
     public function memberships(): HasMany
     {
         return $this->hasMany(InstitutionMembership::class);

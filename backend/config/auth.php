@@ -8,6 +8,22 @@ return [
 
     'api_session_refresh_days' => (int) env('API_SESSION_REFRESH_DAYS', 30),
 
+    'account_activation_hours' => (int) env('ACCOUNT_ACTIVATION_HOURS', 72),
+
+    'account_activation_max_attempts' => (int) env('ACCOUNT_ACTIVATION_MAX_ATTEMPTS', 5),
+
+    'account_activation_lockout_minutes' => (int) env('ACCOUNT_ACTIVATION_LOCKOUT_MINUTES', 60),
+
+    'parent_invitation_hours' => (int) env('PARENT_INVITATION_HOURS', 72),
+
+    'parent_invitation_max_attempts' => (int) env('PARENT_INVITATION_MAX_ATTEMPTS', 5),
+
+    'parent_invitation_lockout_minutes' => (int) env('PARENT_INVITATION_LOCKOUT_MINUTES', 60),
+
+    'temporary_password_length' => (int) env('TEMPORARY_PASSWORD_LENGTH', 16),
+
+    'provisioning_username_max_attempts' => (int) env('PROVISIONING_USERNAME_MAX_ATTEMPTS', 10),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults

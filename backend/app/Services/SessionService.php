@@ -37,7 +37,7 @@ class SessionService
         return DB::transaction(function () use ($sessionId, $secret, $request): ?array {
             $session = ApiSession::query()->with('user')->lockForUpdate()->find($sessionId);
 
-            if (! $session || $session->revoked_at || $session->refresh_expires_at->isPast()) {
+            if (! $session || ! $session->user->is_active || $session->revoked_at || $session->refresh_expires_at->isPast()) {
                 return null;
             }
 
@@ -66,7 +66,7 @@ class SessionService
 
         $session = ApiSession::query()->with('user')->find($sessionId);
 
-        if (! $session || $session->revoked_at || $session->access_expires_at->isPast()) {
+        if (! $session || ! $session->user->is_active || $session->revoked_at || $session->access_expires_at->isPast()) {
             return null;
         }
 
