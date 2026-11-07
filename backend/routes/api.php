@@ -30,6 +30,7 @@ Route::prefix('v1')->group(function (): void {
 
     Route::middleware(AuthenticateApiSession::class)->group(function (): void {
         Route::delete('auth/sessions/current', [AuthSessionController::class, 'destroy']);
+        Route::get('user', [AuthSessionController::class, 'show']);
 
         Route::middleware(ResolveTenantContext::class)->get('tenant-context', function () {
             /** @var Institution $institution */

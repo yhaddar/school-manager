@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_client.dart';
+import '../models/user.dart';
 
 class AuthResponse {
   final bool success;
@@ -22,6 +23,18 @@ class AuthResponse {
   });
 }
 
+class AuthApiResult {
+  final User? user;
+  final TenantContext? tenantContext;
+  final bool isAuthenticated;
+
+  const AuthApiResult({
+    this.user,
+    this.tenantContext,
+    this.isAuthenticated = false,
+  });
+}
+
 class AuthService {
   final ApiClient apiClient;
   final SharedPreferences sharedPreferences;
@@ -29,11 +42,44 @@ class AuthService {
 
   static const String _tokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
+  static const String _userIdKey = 'user_id';
 
   AuthService({
     required this.apiClient,
     required this.sharedPreferences,
   });
+
+  Future<AuthApiResult> getCurrentUser() async {
+    try {
+      final token = await _secureStorage.read(key: _tokenKey);
+      if (token == null) {
+        return const AuthApiResult(isAuthenticated: false);
+      }
+
+      final response = await apiClient.get('/api/v1/user');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final user = User.fromJson(data['data']);
+        
+        final tenantResponse = await apiClient.get('/api/v1/tenant-context');
+        TenantContext? tenantContext;
+        if (tenantResponse.statusCode == 200) {
+          final tenantData = jsonDecode(tenantResponse.body);
+          tenantContext = TenantContext.fromJson(tenantData['data']);
+        }
+
+        return AuthApiResult(
+          user: user,
+          tenantContext: tenantContext,
+          isAuthenticated: true,
+        );
+      } else {
+        return const AuthApiResult(isAuthenticated: false);
+      }
+    } catch (e) {
+      return const AuthApiResult(isAuthenticated: false);
+    }
+  }
 
   Future<bool> isLoggedIn() async {
     final token = await _secureStorage.read(key: _tokenKey);
@@ -53,9 +99,10 @@ class AuthService {
     apiClient.setToken(accessToken);
   }
 
-  void clearTokens() {
-    _secureStorage.delete(key: _tokenKey);
-    _secureStorage.delete(key: _refreshTokenKey);
+  Future<void> clearTokens() async {
+    await _secureStorage.delete(key: _tokenKey);
+    await _secureStorage.delete(key: _refreshTokenKey);
+    await sharedPreferences.remove(_userIdKey);
     apiClient.clearToken();
   }
 
@@ -178,14 +225,14 @@ class AuthService {
           refreshExpiry: refreshTokenExpiry,
         );
       } else {
-        clearTokens();
+        await clearTokens();
         return AuthResponse(
           success: false,
           message: 'Session expired',
         );
       }
     } catch (e) {
-      clearTokens();
+      await clearTokens();
       return AuthResponse(
         success: false,
         message: 'Network error',
@@ -195,6 +242,6 @@ class AuthService {
 
   Future<void> logout() async {
     await apiClient.delete('/api/v1/auth/sessions/current');
-    clearTokens();
+    await clearTokens();
   }
 }

@@ -6,6 +6,9 @@ import '../providers/auth_provider.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/activate_screen.dart';
 import '../screens/admin/home_screen.dart' show AdminHomeScreen;
+import '../screens/professor/home_screen.dart' show ProfessorHomeScreen;
+import '../screens/student/home_screen.dart' show StudentHomeScreen;
+import '../screens/parent/home_screen.dart' show ParentHomeScreen;
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -21,9 +24,9 @@ class AppRouter {
         return '/login';
       }
       
-      // If authenticated, redirect from login to home
+      // If authenticated, redirect from login/activation to appropriate home
       if (isLoggedIn && (location == '/login' || location == '/activate')) {
-        return '/home';
+        return _getHomeRoute(authProvider);
       }
 
       return null;
@@ -43,13 +46,42 @@ class AppRouter {
         path: '/home',
         name: 'home',
         builder: (BuildContext context, GoRouterState state) {
-          // TODO: Determine user role and show appropriate home screen
-          // This is a placeholder - actual implementation will check user role
-          return const AdminHomeScreen();
+          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          return _buildHomeScreen(authProvider);
         },
       ),
     ],
   );
+
+  static String _getHomeRoute(AuthProvider authProvider) {
+    final user = authProvider.user;
+    if (user == null) return '/login';
+    
+    if (user.isAdmin) return '/home';
+    if (user.isTeacher) return '/home';
+    if (user.isStudent) return '/home';
+    if (user.isParent) return '/home';
+    
+    return '/login';
+  }
+
+  static Widget _buildHomeScreen(AuthProvider authProvider) {
+    final user = authProvider.user;
+    if (user == null) return const LoginScreen();
+    
+    // Return appropriate home screen based on user role
+    if (user.isAdmin) {
+      return const AdminHomeScreen();
+    } else if (user.isTeacher) {
+      return const ProfessorHomeScreen();
+    } else if (user.isStudent) {
+      return const StudentHomeScreen();
+    } else if (user.isParent) {
+      return const ParentHomeScreen();
+    }
+    
+    return const LoginScreen();
+  }
 }
 
 class _RouteRefreshListener extends ChangeNotifier {

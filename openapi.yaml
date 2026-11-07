@@ -10,6 +10,20 @@ paths:
       responses:
         '200':
           description: Service is available
+  /api/v1/user:
+    get:
+      summary: Get the current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Missing, expired, or revoked access token
   /api/v1/auth/sessions:
     post:
       summary: Create an API session with email and password
@@ -101,8 +115,7 @@ paths:
                     required: [institution_id]
                     properties:
                       institution_id:
-                        type: string
-                        format: ulid
+                        type: integer
         '401':
           description: Missing, expired, or revoked access token
         '403':
@@ -118,7 +131,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -143,6 +156,37 @@ components:
       scheme: bearer
       bearerFormat: opaque
   schemas:
+    UserResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, name, email, username, user_type, is_active, active_institution_id, membership_role]
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            email:
+              type: string
+              username:
+                type: string
+            user_type:
+              type: string
+              enum: [staff, student, parent]
+            is_active:
+              type: boolean
+            active_institution_id:
+              type: integer
+              nullable: true
+            membership_role:
+              type: string
+              enum: [staff, administrator, director, teacher, student, parent]
+              nullable: true
+            user_id:
+              type: integer
+              description: User ID for token response
     LoginRequest:
       type: object
       required: [email, password]
@@ -187,6 +231,9 @@ components:
             refresh_expires_at:
               type: string
               format: date-time
+            user_id:
+              type: integer
+              description: The user ID for client-side storage
     CourseTeacherAssignmentRequest:
       type: object
       required: [teacher_id]

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\InstitutionMembership;
 use App\Services\SessionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -55,5 +56,27 @@ class AuthSessionController extends Controller
         $sessions->revoke($request->attributes->get('api_session'), $request);
 
         return response()->json(status: 204);
+    }
+
+    public function show(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $membership = InstitutionMembership::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->where('institution_id', $user->active_institution_id)
+            ->first();
+
+        $userData = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'username' => $user->username,
+            'user_type' => $user->user_type->value,
+            'is_active' => $user->is_active,
+            'active_institution_id' => $user->active_institution_id,
+            'membership_role' => $membership?->role->value,
+        ];
+
+        return response()->json(['data' => $userData]);
     }
 }

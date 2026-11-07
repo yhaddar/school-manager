@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/user.dart';
 import '../services/auth_service.dart';
 
 enum AuthStatus {
@@ -14,19 +15,41 @@ class AuthProvider extends ChangeNotifier {
   
   AuthStatus _status = AuthStatus.unknown;
   String? _errorMessage;
+  User? _user;
 
   AuthProvider({required this.authService});
 
   AuthStatus get status => _status;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
+  User? get user => _user;
+  
+  bool get isAdmin => _user?.isAdmin ?? false;
+  bool get isTeacher => _user?.isTeacher ?? false;
+  bool get isStudent => _user?.isStudent ?? false;
+  bool get isParent => _user?.isParent ?? false;
 
   Future<void> initialize() async {
-    final isLoggedIn = await authService.isLoggedIn();
-    if (isLoggedIn) {
+    final result = await authService.getCurrentUser();
+    if (result.user != null) {
+      _user = result.user;
       _status = AuthStatus.authenticated;
     } else {
       _status = AuthStatus.unauthenticated;
+    }
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  Future<void> loadUser() async {
+    final result = await authService.getCurrentUser();
+    if (result.user != null) {
+      _user = result.user;
+      _status = AuthStatus.authenticated;
+      _errorMessage = null;
+    } else {
+      _status = AuthStatus.unauthenticated;
+      _errorMessage = null;
     }
     notifyListeners();
   }
@@ -39,7 +62,7 @@ class AuthProvider extends ChangeNotifier {
     final response = await authService.login(email, password);
 
     if (response.success) {
-      _status = AuthStatus.authenticated;
+      await loadUser();
     } else {
       _errorMessage = response.message;
       _status = AuthStatus.error;
@@ -65,7 +88,7 @@ class AuthProvider extends ChangeNotifier {
     );
 
     if (response.success) {
-      _status = AuthStatus.authenticated;
+      await loadUser();
     } else {
       _errorMessage = response.message;
       _status = AuthStatus.error;
@@ -78,6 +101,7 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     _status = AuthStatus.unauthenticated;
     _errorMessage = null;
+    _user = null;
     await authService.logout();
     notifyListeners();
   }
