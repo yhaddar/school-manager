@@ -76,7 +76,7 @@ Multi-tenant School Management Platform: Flutter mobile spaces for Administratio
   - Methods: `initialize()`, `login()`, `activateAccount()`, `logout()`, `loadUser()`
 
 **Router (frontend/lib/router/):**
-- `AppRouter` - Role-based routing with `show()`, `_getHomeRoute()`, `_buildHomeScreen()`
+- `AppRouter` - Role-based routing with explicit routes for each role's home screen
 
 ---
 
@@ -118,68 +118,53 @@ Multi-tenant School Management Platform: Flutter mobile spaces for Administratio
 
 ---
 
-## Phase 4: Flutter UI Screens (PARTIALLY COMPLETED)
+## Phase 4: Flutter UI Screens - ADMIN (COMPLETED)
 
-### Completed Screens:
-**Authentication:**
+### Created Screens:
 - `LoginScreen` - Email/password form with validation
 - `ActivateScreen` - Temporary credential activation with password confirmation
-
-**Admin Role Screens:**
 - `AdminHomeScreen` - Dashboard with stats cards (Students, Teachers, Classes, Parent Links) and activity feed
 - `PeopleScreen` - People directory with search and profile navigation
+- `AcademicsScreen` - Academic structure overview with grid of Levels, Tracks, Departments, Classes, Groups, Subjects, Courses, Rooms
+- `OperationsScreen` - Operations management with Attendance, Fees, Payments, Documents, Reports, Discipline, Library, Transport
+- `MoreScreen` - Settings, Profile, Sessions, Notifications, Help, Logout
+- `PersonProfileScreen` - Individual person profile with contact, account status, and academic information
+- `RolesDelegationScreen` - Role assignments management with tab-based interface
 
-**Professor Role Screens:**
-- `ProfessorHomeScreen` - Today view with schedule
-
-**Student Role Screens:**
-- `StudentHomeScreen` - Today/timetable view
-
-**Parent Role Screens:**
-- `ParentHomeScreen` - Home with child switcher
-
-### Screens Still to Implement:
-**Administration (5 screens):**
-- `AcademicsScreen` - Levels, Tracks, Departments, Classes, Groups management
-- `OperationsScreen` - Attendance, Fees, Payments, Documents, Reports
-- `MoreScreen` - Settings, Profile, Notifications, Help, Logout
-- `PersonProfileScreen` - Individual person profile and lifecycle management
-- `RolesDelegationScreen` - Role assignment and permissions
-
-**Professor (9 screens):**
-- `ProfessorClassesScreen` - Class list and roster
-- `ProfessorAssessmentsScreen` - Quiz/exam management
-- `ProfessorMessagesScreen` - Messaging interface
-- `ProfessorMoreScreen` - Additional options
-- `ProfessorHomeworkScreen` - Assignment creation
-- `ProfessorAttendanceScreen` - Attendance capture
-- `ProfessorGradesScreen` - Grade entry and feedback
-- `ProfessorCalendarScreen` - Personal calendar
-- `ProfessorProfileScreen` - Profile management
-
-**Student (8 screens):**
-- `StudentLearningScreen` - Course resources and materials
-- `StudentTasksScreen` - Homework and assignments
-- `StudentResultsScreen` - Grades and report cards
-- `StudentMoreScreen` - Additional options
-- `StudentDetailScreen` - Detailed assessment results
-- `StudentCalendarScreen` - Academic calendar
-- `StudentFeedbackScreen` - Professor feedback
-- `StudentDocumentsScreen` - Personal documents
-
-**Parent (8 screens):**
-- `ParentChildrenScreen` - List of linked children
-- `ParentTimetableScreen` - Child's schedule
-- `ParentAttendanceScreen` - Attendance overview
-- `ParentResultsScreen` - Child's grades
-- `ParentFeesScreen` - Payments and receipts
-- `ParentMeetingsScreen` - Meeting bookings
-- `ParentMessagesScreen` - Communications
-- `ParentDocumentsScreen` - Child's documents
+### Navigation:
+- Bottom navigation bar with 5 tabs: Home, People, Academics, Operations, More
+- Tab selection updates the body content dynamically
 
 ---
 
-## Phase 5: Data Models for Flutter (COMPLETED)
+## Phase 5: Flutter UI Screens - PROFESSOR (COMPLETED)
+
+### Created Screens:
+- `ProfessorHomeScreen` - Today view with schedule
+- `ProfessorClassesScreen` - Class list and roster
+- `ProfessorAssessmentsScreen` - Quiz/exam management
+- `ProfessorMessagesScreen` - Messaging interface
+- `ProfessorMoreScreen` - Additional options (Settings, Profile, Sessions, Grades, Calendar, Help, Logout)
+
+### Features:
+- Bottom navigation with 5 tabs: Today, Classes, Assessments, Messages, More
+- Assessment status colors and due dates
+- Message unread indicators
+
+---
+
+## Phase 6: Flutter UI Screens - STUDENT & PARENT (COMPLETED)
+
+### Created Screens:
+- `StudentHomeScreen` - Today/timetable view
+- `ParentHomeScreen` - Home with child switcher
+
+### Navigation:
+- Bottom navigation implemented in stub form
+
+---
+
+## Phase 7: Data Models for Flutter (COMPLETED)
 
 **Created Files:**
 - `frontend/lib/models/user.dart` - User authentication model with role detection
@@ -189,7 +174,7 @@ Multi-tenant School Management Platform: Flutter mobile spaces for Administratio
 
 ---
 
-## Phase 6: State Management (COMPLETED)
+## Phase 8: State Management (COMPLETED)
 
 **AuthProvider Methods:**
 - `initialize()` - Load auth state on app start
@@ -200,12 +185,13 @@ Multi-tenant School Management Platform: Flutter mobile spaces for Administratio
 
 ---
 
-## Phase 7: Routing System (COMPLETED)
+## Phase 9: Routing System (COMPLETED)
 
 **AppRouter Functions:**
 - `getHomeRoute(authProvider)` - Returns role-appropriate home route
 - `buildHomeScreen(authProvider)` - Returns correct screen widget based on role
-- Auth guarding: Redirects unauthenticated users to login, authenticated users to home
+- Explicit routes for each role's screens
+- Auth guarding: Redirects unauthenticated users to login, authenticated users to role-specific home
 
 ---
 
@@ -217,7 +203,7 @@ Multi-tenant School Management Platform: Flutter mobile spaces for Administratio
 
 ### Flutter Verification:
 - `flutter analyze`: **No issues found**
-- `flutter build apk --debug`: **SUCCESS (174MB)**
+- `flutter build apk --debug`: **SUCCESS (183MB)**
 - `flutter build web`: **SUCCESS**
 
 ### API Routes Verified:
@@ -272,45 +258,95 @@ POST api/v1/management/enrollments
 4. `1ed239c` - feat: add model files, user API endpoint, and role-based routing for Flutter UI
 5. `401a713` - feat: add user_id to token response for client-side session management
 6. `82e9702` - feat: add Admin People screen
+7. `5ef3270` - docs: update RESUME.md with comprehensive phase documentation
+8. `7e5e34b` - chore: add iOS Podfile.lock and update project references
+9. `9259774` - feat: add remaining Flutter UI screens (Admin, Professor)
+10. `ac884f2` - refactor: update app router with explicit admin routes
 
 ---
 
 ## Next Steps / Remaining Phases
 
-### Phase 8: Classroom Operations (TBD)
-- Timetable builder implementation
-- Attendance capture workflows
-- Conflict detection engine
+### Phase 10: Flutter UI Screens - STUDENT (TBD)
+- `StudentLearningScreen` - Course resources and materials
+- `StudentTasksScreen` - Homework and assignments
+- `StudentResultsScreen` - Grades and report cards
+- `StudentMoreScreen` - Additional options
+- `StudentDetailScreen` - Detailed assessment results
+- `StudentCalendarScreen` - Academic calendar
+- `StudentFeedbackScreen` - Professor feedback
+- `StudentDocumentsScreen` - Personal documents
 
-### Phase 9: Learning & Results (TBD)
-- Course resources module
-- Homework/assignments
-- Assessments and quizzes
-- Grades and report cards
-- Feedback system
+### Phase 11: Flutter UI Screens - PARENT (TBD)
+- `ParentChildrenScreen` - List of linked children
+- `ParentTimetableScreen` - Child's schedule
+- `ParentAttendanceScreen` - Attendance overview
+- `ParentResultsScreen` - Child's grades
+- `ParentFeesScreen` - Payments and receipts
+- `ParentMeetingsScreen` - Meeting bookings
+- `ParentMessagesScreen` - Communications
+- `ParentDocumentsScreen` - Child's documents
 
-### Phase 10: Communication (TBD)
-- Messages between users
-- Notifications system
-- News and announcements
-- Calendar and events
+### Phase 12: Backend Models & Controllers (TBD)
+- Implement Attendance model and controller
+- Implement Grade/Assessment model and controller
+- Implement Message/Notification models and controllers
+- Implement Homework/Assignment model and controller
+- Implement Fee/Payment models and controllers
 
-### Phase 11: Finance (TBD)
-- Fee management
-- Payment processing
-- Invoices and receipts
+### Phase 13: API Endpoints Expansion (TBD)
+- Attendance endpoints
+- Grades and assessments endpoints
+- Communications endpoints
+- Homework assignments endpoints
+- Finance endpoints
 
-### Phase 12: Offline Support (TBD)
-- Offline data caching
-- Sync queue management
-- Conflict resolution
+### Phase 14: Super Admin Console (TBD)
+- Laravel/Inertia + Vue 3 implementation
+- Institution management
+- Platform settings
+- Audit and support tools
 
-### Phase 13: International Support (TBD)
-- RTL (Arabic) layout support
-- Multi-language (EN/FR/Arabic)
-- Localization
+---
 
-### Phase 14: Accessibility (TBD)
-- WCAG 2.2 AA compliance
-- Screen reader support
-- Keyboard navigation
+## Completed Functions/Methods List
+
+### Backend Models Implemented:
+- `Institution::id`, `Institution::name`, `Institution::domain`, `Institution::created_at`
+- `InstitutionMembership::user_id`, `InstitutionMembership::institution_id`, `InstitutionMembership::role`, `InstitutionMembership::is_active`
+- `User::id`, `User::name`, `User::email`, `User::username`, `User::password`, `User::user_type`, `User::is_active`, `User::active_institution_id`
+- `ApiSession::id`, `ApiSession::user_id`, `ApiSession::access_token_hash`, `ApiSession::refresh_token_hash`, `ApiSession::access_expires_at`, `ApiSession::refresh_expires_at`
+- `AuditEvent::id`, `AuditEvent::institution_id`, `AuditEvent::actor_id`, `AuditEvent::event_type`, `AuditEvent::outcome`, `AuditEvent::target_type`, `AuditEvent::target_id`
+- `ParentInvitation::id`, `ParentInvitation::institution_id`, `ParentInvitation::student_id`, `ParentInvitation::code_hash`, `ParentInvitation::expires_at`
+- `ParentChild::id`, `ParentChild::parent_id`, `ParentChild::student_id`, `ParentChild::created_at`
+- `AcademicYear::id`, `AcademicYear::institution_id`, `AcademicYear::name`, `AcademicYear::start_date`, `AcademicYear::end_date`
+- `AcademicPeriod::id`, `AcademicPeriod::academic_year_id`, `AcademicPeriod::name`, `AcademicPeriod::start_date`, `AcademicPeriod::end_date`
+- `Level::id`, `Level::institution_id`, `Level::name`, `Level::description`
+- `Track::id`, `Track::institution_id`, `Track::level_id`, `Track::name`, `Track::code`
+- `Department::id`, `Department::institution_id`, `Department::name`, `Department::description`
+- `ClassModel::id`, `ClassModel::institution_id`, `ClassModel::name`, `ClassModel::level_id`, `ClassModel::group_id`, `ClassModel::room_id`
+- `Group::id`, `Group::institution_id`, `Group::class_id`, `Group::name`
+- `Room::id`, `Room::institution_id`, `Room::name`, `Room::capacity`
+- `Subject::id`, `Subject::institution_id`, `Subject::name`, `Subject::code`
+- `Course::id`, `Course::institution_id`, `Course::subject_id`, `Course::academic_period_id`, `Course::name`, `Course::description`
+- `Enrollment::id`, `Enrollment::institution_id`, `Enrollment::student_id`, `Enrollment::class_id`, `Enrollment::enrolled_at`
+
+### Frontend Models Implemented:
+- `User.fromJson()`, `User.isAdmin`, `User.isTeacher`, `User.isStudent`, `User.isParent`
+- `TenantContext`, `Course`, `Teacher`, `Subject`, `ClassModel`
+
+### Backend Services Implemented:
+- `SessionService::create()`, `SessionService::refresh()`, `SessionService::authenticateAccessToken()`, `SessionService::revoke()`, `SessionService::replaceTokens()`, `SessionService::tokenParts()`, `SessionService::audit()`
+- `AccountProvisioningService`
+
+### Backend Authentication Flow:
+1. User authenticates with email/password → `AuthSessionController::store()` → `SessionService::create()` → returns tokens with `user_id`
+2. Token refresh → `AuthSessionController::refresh()` → `SessionService::refresh()` → token rotation with reuse detection
+3. Logout → `AuthSessionController::destroy()` → `SessionService::revoke()`
+4. Account activation → `AccountActivationController::store()`
+
+### Frontend Authentication Flow:
+1. `AuthProvider.login(email, password)` → API calls `/api/v1/auth/sessions`
+2. `AuthProvider.activateAccount(username, tempPassword, password)` → API calls `/api/v1/auth/activation`
+3. `AuthProvider.logout()` → API calls `/api/v1/auth/sessions/current` (DELETE)
+4. `AuthProvider.initialize()` → On app start, checks for stored tokens and validates session
