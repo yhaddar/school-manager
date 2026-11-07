@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class SessionService
 {
-    /** @return array{access_token: string, refresh_token: string, access_expires_at: string, refresh_expires_at: string} */
+    /** @return array{access_token: string, refresh_token: string, access_expires_at: string, refresh_expires_at: string, user_id: int} */
     public function create(User $user, Request $request): array
     {
         return DB::transaction(function () use ($user, $request): array {
@@ -25,7 +25,7 @@ class SessionService
         });
     }
 
-    /** @return array{access_token: string, refresh_token: string, access_expires_at: string, refresh_expires_at: string}|null */
+    /** @return array{access_token: string, refresh_token: string, access_expires_at: string, refresh_expires_at: string, user_id: int}|null */
     public function refresh(?string $refreshToken, Request $request): ?array
     {
         [$sessionId, $secret] = $this->tokenParts($refreshToken);
@@ -37,7 +37,7 @@ class SessionService
         return DB::transaction(function () use ($sessionId, $secret, $request): ?array {
             $session = ApiSession::query()->with('user')->lockForUpdate()->find($sessionId);
 
-            if (! $session || ! $session->user->is_active || $session->revoked_at || $session->refresh_expires_at->isPast()) {
+            if (! $session || ! $session->user->is_active || $session->revoked_at || $session->access_expires_at->isPast()) {
                 return null;
             }
 
@@ -83,7 +83,7 @@ class SessionService
         $this->audit($session->user, 'auth.session_revoked', 'success', $request, $session);
     }
 
-    /** @return array{access_token: string, refresh_token: string, access_expires_at: string, refresh_expires_at: string} */
+    /** @return array{access_token: string, refresh_token: string, access_expires_at: string, refresh_expires_at: string, user_id: int} */
     private function replaceTokens(ApiSession $session, Request $request): array
     {
         $accessSecret = bin2hex(random_bytes(32));
@@ -105,6 +105,7 @@ class SessionService
             'refresh_token' => $session->id.'.'.$refreshSecret,
             'access_expires_at' => $accessExpiresAt->toIso8601String(),
             'refresh_expires_at' => $refreshExpiresAt->toIso8601String(),
+            'user_id' => $session->user_id,
         ];
     }
 
