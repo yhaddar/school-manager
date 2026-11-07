@@ -43,11 +43,12 @@ Multi-tenant School Management Platform: Flutter mobile spaces for Administratio
 - Login screen with validation
 - Account activation screen
 - Admin home screen with stats cards and activity list
+- Admin People screen for directory
 - Professor today view with schedule
 - Student home with timetable
 - Parent home with child switcher
 - AuthProvider with role detection (isAdmin, isTeacher, isStudent, isParent)
-- AppRouter with role-based routing to appropriate home screens
+- AppRouter with role-based routing to appropriate home screen
 - User model with account type and membership role
 - Course/Class models for data layer
 - API client and auth service for backend communication
@@ -60,9 +61,11 @@ Multi-tenant School Management Platform: Flutter mobile spaces for Administratio
 - `frontend/lib/models/class_model.dart` - ClassModel and Student models
 - `frontend/lib/models/institution.dart` - Institution model
 - `frontend/lib/providers/auth_provider.dart` - Updated with user state and role detection
+- `frontend/lib/screens/admin/people_screen.dart` - People directory screen
 - `frontend/lib/router/app_router.dart` - Role-based routing implementation
 - `frontend/lib/services/auth_service.dart` - Added getCurrentUser method
 - `backend/app/Http/Controllers/Api/AuthSessionController.php` - Added user endpoint
+- `backend/app/Services/SessionService.php` - Added user_id to token response
 - `backend/routes/api.php` - Added `/api/v1/user` route
 - `openapi.yaml` - Updated with UserResponse schema
 
@@ -71,27 +74,25 @@ Multi-tenant School Management Platform: Flutter mobile spaces for Administratio
 2. `247c445` - feat: add Flutter UI foundation for School Manager app
 3. `afecb90` - feat: build modern mobile UI for School Manager app
 4. `1ed239c` - feat: add model files, user API endpoint, and role-based routing for Flutter UI
+5. `401a713` - feat: add user_id to token response for client-side session management
 
 ### Laravel Backend Tests:
 - All 55 tests pass with 299 assertions
-- Database migrations verified with SQLite
+- PostgreSQL migrations verified successfully
 
-### Next Steps:
-- Connect Flutter app to Laravel API backend (requires `.env` configuration)
-- Implement remaining screens per DESIGN.md:
-  - People directory
-  - Academic calendar
-  - Timetable builder
-  - Attendance capture
-  - Learning resources
-  - Assessments/quizzes
-  - Messages/communications
-
-## Blockers
-- PostgreSQL database requires DB_URL/DB_HOST configuration for local testing
-- Backend API requires `.env` file with proper database configuration
-
-## Verification
+### Verification:
 - `flutter analyze`: No issues found
 - `flutter build apk --debug`: SUCCESS (174MB)
 - `backend/php artisan test --compact`: 55 tests / 299 assertions passed
+- PostgreSQL migrations: All 24 migrations migrated successfully
+
+### Remaining Next Steps:
+- Connect Flutter app to Laravel API backend (requires `API_URL` environment variable)
+- Implement remaining screens per DESIGN.md:
+  - Administration: Academics, Operations, More
+  - Professor: Classes, Assessments, Messages, More
+  - Student: Learning, Tasks, Results, More
+  - Parent: Children, Payments, Messages, More
+  - All screens with proper state handling (loading, empty, error, success)
+  - RTL (Arabic) support
+  - Accessibility features
