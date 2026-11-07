@@ -6,6 +6,10 @@ import '../providers/auth_provider.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/activate_screen.dart';
 import '../screens/admin/home_screen.dart' show AdminHomeScreen;
+import '../screens/admin/people_screen.dart' show PeopleScreen;
+import '../screens/admin/academics_screen.dart' show AcademicsScreen;
+import '../screens/admin/operations_screen.dart' show OperationsScreen;
+import '../screens/admin/more_screen.dart' show MoreScreen;
 import '../screens/professor/home_screen.dart' show ProfessorHomeScreen;
 import '../screens/student/home_screen.dart' show StudentHomeScreen;
 import '../screens/parent/home_screen.dart' show ParentHomeScreen;
@@ -42,13 +46,49 @@ class AppRouter {
         name: 'activate',
         builder: (BuildContext context, GoRouterState state) => const ActivateScreen(),
       ),
+      // Admin routes
       GoRoute(
-        path: '/home',
-        name: 'home',
-        builder: (BuildContext context, GoRouterState state) {
-          final authProvider = Provider.of<AuthProvider>(context, listen: false);
-          return _buildHomeScreen(authProvider);
-        },
+        path: '/admin/home',
+        name: 'admin-home',
+        builder: (BuildContext context, GoRouterState state) => const AdminHomeScreen(),
+      ),
+      GoRoute(
+        path: '/admin/people',
+        name: 'admin-people',
+        builder: (BuildContext context, GoRouterState state) => const PeopleScreen(),
+      ),
+      GoRoute(
+        path: '/admin/academics',
+        name: 'admin-academics',
+        builder: (BuildContext context, GoRouterState state) => const AcademicsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/operations',
+        name: 'admin-operations',
+        builder: (BuildContext context, GoRouterState state) => const OperationsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/more',
+        name: 'admin-more',
+        builder: (BuildContext context, GoRouterState state) => const MoreScreen(),
+      ),
+      // Professor routes
+      GoRoute(
+        path: '/professor/home',
+        name: 'professor-home',
+        builder: (BuildContext context, GoRouterState state) => const ProfessorHomeScreen(),
+      ),
+      // Student routes
+      GoRoute(
+        path: '/student/home',
+        name: 'student-home',
+        builder: (BuildContext context, GoRouterState state) => const StudentHomeScreen(),
+      ),
+      // Parent routes
+      GoRoute(
+        path: '/parent/home',
+        name: 'parent-home',
+        builder: (BuildContext context, GoRouterState state) => const ParentHomeScreen(),
       ),
     ],
   );
@@ -57,30 +97,12 @@ class AppRouter {
     final user = authProvider.user;
     if (user == null) return '/login';
     
-    if (user.isAdmin) return '/home';
-    if (user.isTeacher) return '/home';
-    if (user.isStudent) return '/home';
-    if (user.isParent) return '/home';
+    if (user.isAdmin) return '/admin/home';
+    if (user.isTeacher) return '/professor/home';
+    if (user.isStudent) return '/student/home';
+    if (user.isParent) return '/parent/home';
     
     return '/login';
-  }
-
-  static Widget _buildHomeScreen(AuthProvider authProvider) {
-    final user = authProvider.user;
-    if (user == null) return const LoginScreen();
-    
-    // Return appropriate home screen based on user role
-    if (user.isAdmin) {
-      return const AdminHomeScreen();
-    } else if (user.isTeacher) {
-      return const ProfessorHomeScreen();
-    } else if (user.isStudent) {
-      return const StudentHomeScreen();
-    } else if (user.isParent) {
-      return const ParentHomeScreen();
-    }
-    
-    return const LoginScreen();
   }
 }
 
