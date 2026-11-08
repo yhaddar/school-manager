@@ -1,6 +1,6 @@
 # Resume — School Manager Implementation
 
-## Current Status: Phase 8 COMPLETED, Phase 9+ IN PROGRESS
+## Current Status: Phase 8 COMPLETED, Phase 9 PARTIALLY COMPLETED, Phase 10 BLOCKED
 
 ### Completed Phases
 
@@ -93,20 +93,25 @@
 - ✅ Widget tests for all three screens
 
 **Frontend Tests:**
-- ✅ 82 Flutter widget tests - ALL PASSING
-- ✅ Flutter analyze: 23 info/warnings (no errors)
+- ✅ 90 Flutter widget tests - ALL PASSING
 
-### Phase 9 — Accessibility, Backup, Final Audit: IN PROGRESS
+### Phase 9 — Accessibility, Backup, Final Audit: PARTIALLY COMPLETED
 
 **Completed:**
+- ✅ Fixed authentication redirect bug in `auth_service.dart`
+  - `getCurrentUser()` now sets token on apiClient before making requests
+  - Login/registration now properly navigates based on user role
+- ✅ Added Arabic RTL support in `main.dart`
+  - Directionality widget sets RTL for Arabic locale
+  - LTR for English/French
 - ✅ iOS simulator build successful (iPhone 18 Pro, iOS 27)
 - ✅ App runs on simulator with live API connection
+- ✅ Added auth flow widget tests
 
 **Remaining:**
-- 🔸 Arabic RTL support testing
-- 🔸 Accessibility compliance verification
-- 🔸 Backup and recovery testing
-- 🔸 Full E2E testing on simulator
+- 🔸 Accessibility compliance verification (semantic labels, screen reader)
+- 🔸 Backup/restore functionality (not implemented - backend feature not required for Phase 9)
+- 🔸 Full E2E testing on simulator (requires manual interaction)
 
 ### Phase 10 — Super Admin Platform: BLOCKED (PD-005)
 - Requires PD-005 approval for:
@@ -117,7 +122,7 @@
 
 ### Test Results
 - **Backend:** 131 tests, 581 assertions - ALL PASSING
-- **Flutter:** 82 tests - ALL PASSING  
+- **Flutter:** 90 tests - ALL PASSING  
 - **Flutter analyze:** 23 info/warnings (no errors)
 
 ### Files Created
@@ -130,9 +135,11 @@
 - Frontend Screens: `reports_screen.dart`, `exports_screen.dart`, `imports_screen.dart`
 - Frontend Models: `report_model.dart`, `export_model.dart`, `import_model.dart`
 - Frontend Services: `report_service.dart`, `export_service.dart`, `import_service.dart`
-- Frontend Tests: `admin_reports_widget_test.dart`, `admin_exports_widget_test.dart`, `admin_imports_widget_test.dart`
+- Frontend Tests: `admin_reports_widget_test.dart`, `admin_exports_widget_test.dart`, `admin_imports_widget_test.dart`, `auth_flow_test.dart`
 
 ### Files Modified
+- `frontend/lib/services/auth_service.dart` - Fixed authentication redirect bug
+- `frontend/lib/main.dart` - Added RTL support via Directionality widget
 - `backend/app/Enums/InstitutionPermission.php` - Added reports/exports/imports permissions
 - `backend/routes/api.php` - Added routes for reports/exports/imports
 - `frontend/lib/router/app_router.dart` - Added routes for admin screens
@@ -149,13 +156,17 @@
 - Health check: `/api/v1/health` returns 200 OK
 - API endpoints verified working
 
+### Authentication Flow Fix
+The login redirect issue was in `AuthService.getCurrentUser()`:
+- **Problem:** Token was read from secure storage but not set on `apiClient` before making `/api/v1/user` request
+- **Solution:** Added `apiClient.setToken(token)` before the API call
+- **Result:** User data with `membership_role` is now properly parsed and navigation works correctly
+
 ### Next Steps
-1. Phase 9: Complete RTL support, accessibility, backup/recovery testing
-2. Run iOS simulator E2E tests
-3. Test backend API integration with Flutter app
-4. Request PD-005 approval for Super Admin features (Phase 10)
+1. Phase 9: Test accessibility compliance with screen reader
+2. Phase 9: Run E2E tests on iOS simulator
+3. Request PD-005 approval for Super Admin features (Phase 10)
 
 ### Known Issues
-- None - all tests passing
-- No lint errors
-- iOS build successful
+- Backup/restore functionality not implemented (backend feature)
+- Accessibility verification needs manual testing with screen reader
