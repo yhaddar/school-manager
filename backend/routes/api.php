@@ -30,6 +30,9 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\SuperAdmin\InstitutionController;
+use App\Http\Controllers\Api\SuperAdmin\SubscriptionController;
+use App\Http\Controllers\Api\SuperAdmin\SupportController;
+use App\Http\Controllers\Api\SuperAdmin\TenantController;
 
 use App\Http\Middleware\AuthenticateApiSession;
 use App\Http\Middleware\ResolveTenantContext;
@@ -51,6 +54,36 @@ Route::prefix('v1')->group(function (): void {
         Route::get('super-admin/institutions/{institution}', [InstitutionController::class, 'show']);
         Route::put('super-admin/institutions/{institution}', [InstitutionController::class, 'update']);
         Route::delete('super-admin/institutions/{institution}', [InstitutionController::class, 'destroy']);
+        
+        // Super Admin - Subscription Management
+        Route::get('super-admin/subscriptions', [SubscriptionController::class, 'index']);
+        Route::post('super-admin/subscriptions', [SubscriptionController::class, 'store']);
+        Route::get('super-admin/subscriptions/{plan}', [SubscriptionController::class, 'show']);
+        Route::put('super-admin/subscriptions/{plan}', [SubscriptionController::class, 'update']);
+        Route::delete('super-admin/subscriptions/{plan}', [SubscriptionController::class, 'destroy']);
+        Route::get('super-admin/subscriptions/list', [SubscriptionController::class, 'listSubscriptions']);
+        
+        // Super Admin - Institution Subscription Management
+        Route::post('super-admin/institutions/{institution}/subscription', [SubscriptionController::class, 'assignToInstitution']);
+        Route::post('super-admin/institutions/{institution}/subscription/renew', [SubscriptionController::class, 'renew']);
+        Route::get('super-admin/institutions/{institution}/subscription/history', [SubscriptionController::class, 'history']);
+        
+        // Super Admin - Support Access
+        Route::post('super-admin/support/requests', [SupportController::class, 'store']);
+        Route::get('super-admin/support/requests', [SupportController::class, 'index']);
+        Route::get('super-admin/support/requests/{request}', [SupportController::class, 'show']);
+        Route::post('super-admin/support/requests/{request}/approve', [SupportController::class, 'approve']);
+        Route::post('super-admin/support/requests/{request}/deny', [SupportController::class, 'deny']);
+        Route::post('super-admin/support/requests/{request}/access', [SupportController::class, 'grantAccess']);
+        Route::get('super-admin/support/requests/{request}/audit', [SupportController::class, 'audit']);
+        Route::post('super-admin/support/sessions/{session}/terminate', [SupportController::class, 'terminate']);
+        
+        // Super Admin - Tenant Lifecycle
+        Route::post('super-admin/institutions/{id}/activate', [TenantController::class, 'activate']);
+        Route::post('super-admin/institutions/{id}/suspend', [TenantController::class, 'suspend']);
+        Route::post('super-admin/institutions/{id}/reactivate', [TenantController::class, 'reactivate']);
+        Route::post('super-admin/institutions/{id}/archive', [TenantController::class, 'archive']);
+        Route::post('super-admin/institutions/{id}/restore', [TenantController::class, 'restore']);
     });
 
     Route::middleware(AuthenticateApiSession::class)->group(function (): void {

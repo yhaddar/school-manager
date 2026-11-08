@@ -2,22 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-#[Fillable(['name', 'status'])]
 class Institution extends Model
 {
-    use HasUlids;
+    use HasUlids, HasFactory;
 
-    protected $keyType = 'string';
-
+    protected $keyType = "string";
     public $incrementing = false;
 
-    protected $attributes = [
-        'status' => 'active',
+    protected $fillable = [
+        "name",
+        "status",
+        "archived_at",
+    ];
+
+    protected $casts = [
+        "archived_at" => "datetime",
     ];
 
     public function memberships(): HasMany

@@ -110,7 +110,7 @@ void main() {
         'username': 'admin',
         'user_type': 'staff',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': 'administrator',
       };
 
@@ -122,7 +122,7 @@ void main() {
       expect(user.username, 'admin');
       expect(user.userType, UserAccountType.staff);
       expect(user.isActive, true);
-      expect(user.activeInstitutionId, 1);
+      expect(user.activeInstitutionId, '01m6yfrtk6g69qtdh6186q4zrt');
       expect(user.membershipRole, MembershipRole.administrator);
       expect(user.isAdmin, isTrue, reason: 'User with membership_role=administrator should be detected as admin');
     });
@@ -135,7 +135,7 @@ void main() {
         'username': 'student',
         'user_type': 'student',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': null,
       };
 
@@ -158,7 +158,7 @@ void main() {
         'username': 'parent',
         'user_type': 'parent',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': null,
       };
 
@@ -178,7 +178,7 @@ void main() {
         'username': 'superadmin',
         'user_type': 'staff',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': 'super-admin',
       };
 
@@ -190,7 +190,7 @@ void main() {
       expect(user.username, 'superadmin');
       expect(user.userType, UserAccountType.staff);
       expect(user.isActive, true);
-      expect(user.activeInstitutionId, 1);
+      expect(user.activeInstitutionId, '01m6yfrtk6g69qtdh6186q4zrt');
       expect(user.membershipRole, MembershipRole.superAdmin);
       expect(user.isSuperAdmin, isTrue, reason: 'User with membership_role=super-admin should be detected as superAdmin');
       expect(user.isAdmin, isFalse);
@@ -266,7 +266,7 @@ void main() {
         'username': 'superadmin',
         'user_type': 'staff',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': 'super-admin',
       });
 
@@ -283,7 +283,7 @@ void main() {
         'username': 'admin',
         'user_type': 'staff',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': 'administrator',
       });
 
@@ -299,7 +299,7 @@ void main() {
         'username': 'student',
         'user_type': 'student',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': null,
       });
 

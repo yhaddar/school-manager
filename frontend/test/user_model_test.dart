@@ -11,7 +11,7 @@ void main() {
         'username': 'johndoe',
         'user_type': 'student',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': 'student',
       };
 
@@ -23,7 +23,7 @@ void main() {
       expect(user.username, 'johndoe');
       expect(user.userType, UserAccountType.student);
       expect(user.isActive, true);
-      expect(user.activeInstitutionId, 1);
+      expect(user.activeInstitutionId, '01m6yfrtk6g69qtdh6186q4zrt');
       expect(user.membershipRole, MembershipRole.student);
     });
 
@@ -174,7 +174,6 @@ void main() {
 
   group('User.fromJson - API Response Compatibility', () {
     test('parses actual API response for student user', () {
-      // This simulates the actual API response
       final json = {
         'id': 1,
         'name': 'Test User',
@@ -193,8 +192,6 @@ void main() {
       expect(user.email, 'test@example.com');
       expect(user.userType, UserAccountType.student);
       expect(user.membershipRole, isNull);
-      
-      // These are the key checks for navigation
       expect(user.isStudent, isTrue, reason: 'User with user_type=student should be detected as student');
       expect(user.isAdmin, isFalse);
       expect(user.isTeacher, isFalse);
@@ -210,7 +207,7 @@ void main() {
         'username': 'teacher1',
         'user_type': 'staff',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': 'teacher',
       };
 
@@ -218,7 +215,6 @@ void main() {
 
       expect(user.userType, UserAccountType.staff);
       expect(user.membershipRole, MembershipRole.teacher);
-      
       expect(user.isTeacher, isTrue, reason: 'User with membership_role=teacher should be detected as teacher');
       expect(user.isAdmin, isFalse);
       expect(user.isStudent, isFalse);
@@ -234,7 +230,7 @@ void main() {
         'username': 'admin',
         'user_type': 'staff',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': 'administrator',
       };
 
@@ -242,7 +238,6 @@ void main() {
 
       expect(user.userType, UserAccountType.staff);
       expect(user.membershipRole, MembershipRole.administrator);
-      
       expect(user.isAdmin, isTrue, reason: 'User with membership_role=administrator should be detected as admin');
       expect(user.isTeacher, isFalse);
       expect(user.isStudent, isFalse);
@@ -258,14 +253,13 @@ void main() {
         'username': 'parent1',
         'user_type': 'parent',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': null,
       };
 
       final user = User.fromJson(json);
 
       expect(user.userType, UserAccountType.parent);
-      
       expect(user.isParent, isTrue, reason: 'User with user_type=parent should be detected as parent');
       expect(user.isAdmin, isFalse);
       expect(user.isTeacher, isFalse);
@@ -281,7 +275,7 @@ void main() {
         'username': 'superadmin',
         'user_type': 'staff',
         'is_active': true,
-        'active_institution_id': 1,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
         'membership_role': 'super-admin',
       };
 
@@ -289,13 +283,38 @@ void main() {
 
       expect(user.userType, UserAccountType.staff);
       expect(user.membershipRole, MembershipRole.superAdmin);
-      
       expect(user.isSuperAdmin, isTrue, reason: 'User with membership_role=super-admin should be detected as superAdmin');
       expect(user.isAdmin, isFalse);
       expect(user.isTeacher, isFalse);
       expect(user.isStudent, isFalse);
       expect(user.isParent, isFalse);
       expect(user.hasValidRole, isTrue, reason: 'SuperAdmin should have valid role');
+    });
+  });
+
+  group('UUID String Support', () {
+    test('handles UUID string for active_institution_id (real API format)', () {
+      final json = {
+        'id': 2,
+        'name': 'Super Admin',
+        'email': 'superadmin@schoolmanager.test',
+        'username': 'superadmin',
+        'user_type': 'staff',
+        'is_active': true,
+        'active_institution_id': '01m6yfrtk6g69qtdh6186q4zrt',
+        'membership_role': 'super-admin',
+      };
+
+      final user = User.fromJson(json);
+
+      expect(user.id, 2);
+      expect(user.name, 'Super Admin');
+      expect(user.email, 'superadmin@schoolmanager.test');
+      expect(user.userType, UserAccountType.staff);
+      expect(user.activeInstitutionId, '01m6yfrtk6g69qtdh6186q4zrt');
+      expect(user.membershipRole, MembershipRole.superAdmin);
+      expect(user.isSuperAdmin, isTrue, reason: 'User with membership_role=super-admin should be detected as superAdmin');
+      expect(user.hasValidRole, isTrue);
     });
   });
 }

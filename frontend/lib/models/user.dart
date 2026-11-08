@@ -21,7 +21,7 @@ class User {
   final String username;
   final UserAccountType userType;
   final bool isActive;
-  final int? activeInstitutionId;
+  final String? activeInstitutionId;
   final MembershipRole? membershipRole;
 
   User({
@@ -61,7 +61,7 @@ class User {
       username: json['username'] as String? ?? '',
       userType: userType,
       isActive: json['is_active'] as bool? ?? true,
-      activeInstitutionId: json['active_institution_id'] as int?,
+      activeInstitutionId: json['active_institution_id'] as String?,
       membershipRole: membershipRole,
     );
   }

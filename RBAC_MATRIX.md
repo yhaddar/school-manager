@@ -1,158 +1,82 @@
 # Role-Based Access Control Matrix — Super Admin Platform
 
 **Status:** Specification in progress — BLOCKED pending user approval  
-**PD-005 Scope:** APPROVED for specification only
-
-## Overview
-
-This document defines the permission matrix for all roles in the School Manager platform, with emphasis on the Super Admin capabilities.
-
----
+**PD-005 Compliance:** Updated with D-01 through D-06 decisions
 
 ## Role Definitions
 
-| Role | Description | Default Assignment |
+| Role | Description | Assignment |
 |---|---|---|
-| Super Admin | Platform administrator with access to all platform-level features | System-defined, cannot be created by other admins |
-| Institution Administrator | Manages a single institution | Created by Super Admin |
-| Department Administrator | Manages a department within an institution | Created by Institution Admin |
-| Professor | Teaches classes within an institution | Created by Institution Admin |
-| Student | Learner within an institution | Created by Institution Admin |
-| Parent | Guardian of student(s) | Invited via institution admin |
+| Super Admin | Platform administrator with full platform management | System-defined, cannot be created |
+
+**Note:** Department Administrator role excluded from Phase 10 scope
 
 ---
 
 ## Super Admin Permissions Matrix
 
-### Core Platform Permissions
+### Platform Management Permissions
 
-| Permission Key | Description | Requires Approval |
+| Permission Key | Description | Approval Required |
 |---|---|---|
-| `platform.view` | View platform dashboard and metrics | ✅ |
-| `platform.configure` | Modify platform settings | ✅ |
-| `platform.health` | View health status | ✅ |
-| `platform.audit.view` | View platform audit events | ✅ |
+| `platform.view` | View platform dashboard and metrics | ❌ Standard |
+| `platform.configure` | Modify platform settings | ❌ Standard |
+| `platform.health` | View platform health status | ❌ Standard |
+| `platform.audit.view` | View platform audit events | ❌ Standard |
+| `tenant.metadata.view` | View institution metadata (name, ID, status) | ❌ Standard |
+| `tenant.metadata.search` | Search institutions by metadata | ❌ Standard |
 
 ### Subscription Management Permissions
 
-| Permission Key | Description | Requires Approval |
+| Permission Key | Description | Approval Required |
 |---|---|---|
-| `subscription.plans.view` | View subscription plans | ✅ |
-| `subscription.plans.create` | Create new subscription plans | ✅ |
-| `subscription.plans.modify` | Modify existing plans | ✅ |
-| `subscription.institution.assign` | Assign plan to institution | ✅ |
-| `subscription.institution.upgrade` | Upgrade institution subscription | ✅ |
-| `subscription.institution.downgrade` | Downgrade institution subscription | ✅ |
-| `subscription.history.view` | View subscription change history | ✅ |
+| `subscription.plans.view` | View subscription plans | ❌ Standard |
+| `subscription.plans.create` | Create new subscription plans | ❌ Standard |
+| `subscription.plans.modify` | Modify existing plans | ❌ Standard |
+| `subscription.institution.assign` | Assign plan to institution | ❌ Standard |
+| `subscription.institution.upgrade` | Upgrade institution subscription | ❌ Standard |
+| `subscription.institution.downgrade` | Downgrade institution subscription | ❌ Standard |
+| `subscription.institution.renew` | Process subscription renewal | ❌ Standard |
+| `subscription.institution.grace_manage` | Manage grace period | ❌ Standard |
+| `subscription.history.view` | View subscription history | ❌ Standard |
 
 ### Tenant Lifecycle Permissions
 
-| Permission Key | Description | Requires Approval |
+| Permission Key | Description | Approval Required |
 |---|---|---|
-| `tenant.institutions.view` | View all institutions | ✅ |
-| `tenant.institutions.search` | Search institutions | ✅ |
-| `tenant.institutions.create` | Create new institution | ✅ |
-| `tenant.institutions.activate` | Activate institution | ✅ |
-| `tenant.institutions.suspend` | Suspend institution | ✅ |
-| `tenant.institutions.reactivate` | Reactivate suspended institution | ✅ |
-| `tenant.institutions.archive` | Archive institution (not delete) | ✅ |
-| `tenant.institutions.view_data` | View tenant data for support | ⚠️ Requires explicit approval |
+| `tenant.institutions.view` | View institutions (metadata only) | ❌ Standard |
+| `tenant.institutions.search` | Search institutions | ❌ Standard |
+| `tenant.institutions.create` | Create new institution | ❌ Standard |
+| `tenant.institutions.activate` | Activate institution | ❌ Standard |
+| `tenant.institutions.suspend` | Suspend institution | ❌ Standard |
+| `tenant.institutions.reactivate` | Reactivate suspended institution | ❌ Standard |
+| `tenant.institutions.archive` | Archive institution | ❌ Standard |
+| `tenant.institutions.restore` | Restore archived institution | ❌ Standard |
+| `tenant.retention.configure` | Configure retention policies | ⚠️ Separate approval required |
 
 ### Support Access Permissions
 
-| Permission Key | Description | Requires Approval |
+| Permission Key | Description | Approval Required |
 |---|---|---|
-| `support.requests.create` | Create support request | ✅ |
-| `support.requests.approve` | Approve support request | ✅ |
-| `support.access.grant` | Grant support session access | ✅ |
-| `support.access.impersonate` | Impersonate user for support | ⚠️ Requires dual approval |
-| `support.audit.view` | View support session logs | ✅ |
+| `support.requests.create` | Create support request | ❌ Standard |
+| `support.requests.approve` | Approve support request | ⚠️ Independent approver |
+| `support.access.grant_read` | Grant read-only access | ❌ Standard |
+| `support.access.grant_limited` | Grant limited write access | ⚠️ **Separate explicit approval** |
+| `support.audit.view` | View support session logs | ❌ Standard |
+| `support.session.terminate` | Terminate support session | ❌ Standard |
 
-### Audit Permissions
+**NOT IMPLEMENTED (Excluded from Phase 10):**
+- `support.access.grant_full` - Full Support (EXCLUDED)
+- `support.impersonate` - Impersonation (EXCLUDED)
 
-| Permission Key | Description | Requires Approval |
+### MFA and Authentication Permissions
+
+| Permission Key | Description | Approval Required |
 |---|---|---|
-| `audit.platform.view` | View platform audit events | ✅ |
-| `audit.user_activity.view` | View user activity (limited) | ⚠️ Requires justification |
-| `audit.export` | Export audit logs | ✅ |
-
----
-
-## Institution Administrator Permissions
-
-| Module | View | Create | Update | Delete | Special |
-|---|---|---|---|---|---|
-| Users | ✅ | ✅ | ✅ | ❌ | - |
-| Classes | ✅ | ✅ | ✅ | ❌ | - |
-| Students | ✅ | ✅ | ✅ | ❌ | Mass actions |
-| Teachers | ✅ | ✅ | ✅ | ❌ | - |
-| Subjects | ✅ | ✅ | ✅ | ❌ | - |
-| Courses | ✅ | ✅ | ✅ | ❌ | - |
-| Timetable | ✅ | ✅ | ✅ | ❌ | Conflict check |
-| Attendance | ✅ | ⚠️ | ✅ | ❌ | Only own classes |
-| Grades | ✅ | ❌ | ✅ | ❌ | Only own students |
-| Assignments | ✅ | ✅ | ✅ | ❌ | - |
-| Resources | ✅ | ✅ | ✅ | ❌ | - |
-| Messages | ✅ | ✅ | ✅ | ❌ | - |
-| Notifications | ✅ | ✅ | ✅ | ❌ | - |
-| Events | ✅ | ✅ | ✅ | ❌ | - |
-| Fees | ✅ | ✅ | ✅ | ❌ | - |
-| Payments | ✅ | ❌ | ❌ | ❌ | - |
-| Reports | ✅ | ✅ | ❌ | ❌ | - |
-| Exports | ✅ | ✅ | ❌ | ❌ | - |
-| Settings | ✅ | ✅ | ✅ | ❌ | - |
-
----
-
-## Professor Permissions
-
-| Module | View | Create | Update | Delete | Special |
-|---|---|---|---|---|---|
-| My Classes | ✅ | ❌ | ❌ | ❌ | - |
-| My Students | ✅ | ❌ | ❌ | ❌ | - |
-| Attendance | ✅ | ✅ | ✅ | ❌ | Only own classes |
-| Grades | ✅ | ✅ | ✅ | ❌ | Only own students |
-| Assignments | ✅ | ✅ | ✅ | ❌ | - |
-| Resources | ✅ | ✅ | ✅ | ❌ | - |
-| Assessments | ✅ | ✅ | ✅ | ❌ | Create for own subjects |
-| Quizzes | ✅ | ✅ | ✅ | ❌ | - |
-| Messages | ✅ | ✅ | ✅ | ❌ | - |
-| Calendar | ✅ | ✅ | ✅ | ❌ | - |
-| Results | ✅ | ❌ | ❌ | ❌ | View only own students |
-| Feedback | ✅ | ✅ | ✅ | ❌ | - |
-
----
-
-## Student Permissions
-
-| Module | View | Create | Update | Delete | Special |
-|---|---|---|---|---|---|
-| My Schedule | ✅ | ❌ | ❌ | ❌ | - |
-| My Classes | ✅ | ❌ | ❌ | ❌ | - |
-| Learning | ✅ | ✅ | ❌ | ❌ | Submit assignments |
-| Tasks | ✅ | ✅ | ✅ | ❌ | Submit, view status |
-| Results | ✅ | ❌ | ❌ | ❌ | - |
-| Grades | ✅ | ❌ | ❌ | ❌ | - |
-| Feedback | ✅ | ❌ | ❌ | ❌ | - |
-| Messages | ✅ | ✅ | ✅ | ❌ | - |
-| Calendar | ✅ | ❌ | ❌ | ❌ | - |
-
----
-
-## Parent Permissions
-
-| Module | View | Create | Update | Delete | Special |
-|---|---|---|---|---|---|
-| My Children | ✅ | ❌ | ❌ | ❌ | Only linked children |
-| Child Schedule | ✅ | ❌ | ❌ | ❌ | - |
-| Child Results | ✅ | ❌ | ❌ | ❌ | - |
-| Child Grades | ✅ | ❌ | ❌ | ❌ | - |
-| Child Attendance | ✅ | ❌ | ❌ | ❌ | Submit justifications |
-| Child Assignments | ✅ | ❌ | ❌ | ❌ | - |
-| Messages | ✅ | ✅ | ✅ | ❌ | For own children |
-| Calendar | ✅ | ❌ | ❌ | ❌ | - |
-| Fees | ✅ | ✅ | ✅ | ❌ | Pay for own children |
-| Documents | ✅ | ❌ | ❌ | ❌ | - |
+| `mfa.enroll` | Enroll in MFA | ❌ Standard |
+| `mfa.verify` | Verify MFA for session | ❌ Standard |
+| `mfa.recovery.use` | Use MFA recovery code | ⚠️ Separate authentication |
+| `mfa.admin_reset` | Administrator reset MFA | ⚠️ Requires separate approval |
 
 ---
 
@@ -160,62 +84,111 @@ This document defines the permission matrix for all roles in the School Manager 
 
 ### Cross-Tenant Protection
 
-1. **Tenant Context Resolution:** Every request must resolve tenant context from authenticated session
-2. **Resource Scoping:** All queries must include `WHERE institution_id = ?`
-3. **Policy Enforcement:** Policies deny cross-tenant access by default
-4. **Audit Trail:** Cross-tenant access attempts are logged
+1. **Tenant Context Resolution:** Every request resolves tenant context from authenticated session
+2. **Resource Scoping:** All queries include `WHERE institution_id = ?`
+3. **Metadata-Only:** Cross-tenant queries return only name, ID, status
+4. **Policy Enforcement:** Policies deny cross-content access by default
+5. **Audit Trail:** Cross-tenant access attempts are logged
 
-### Super Admin Isolation
+### Support Access Isolation
 
-1. **No Routine Tenant Browsing:** Super Admin cannot view tenant data without support access
-2. **Explicit Justification:** All tenant data access requires justification
-3. **Time-Bounded Access:** Support sessions expire automatically
-4. **Complete Audit:** All Super Admin actions are fully logged
+1. **Session Isolation:** Support sessions cannot access multiple institutions
+2. **Read-Only Default:** Support sessions default to read-only
+3. **Limited Write:** Optional limited write (requires separate approval)
+4. **No Impersonation:** Impersonation not available in Phase 10
 
-### Data Protection
+### Authorization Checks
 
-1. **Password Protection:** Passwords are never exposed via API
-2. **Financial Data:** Payment details are never accessible
-3. **Audit Data:** Audit events cannot be modified
-4. **Deleted Data:** Soft-deleted records are not returned
+**Ordinary Authorization:**
+- Standard permission checks via middleware
+- Role-based access control
+- Tenant-scoped queries
+
+**Per-Action Approval:**
+- Limited write operations
+- Retention policy changes
+- MFA admin reset
+
+### MFA Requirements
+
+| Action Category | MFA Required |
+|---|---|
+| Platform access | ✅ Yes |
+| Institution lifecycle | ✅ Yes |
+| Subscription management | ✅ Yes |
+| Support access | ✅ Yes |
+| Audit log viewing | ✅ Yes |
+| Configuration changes | ✅ Yes |
 
 ---
 
-## Approval Requirements
+## Approval Workflows
 
-### Requires Explicit Approval (PD-005)
+### Limited Write Access
 
-- Super Admin platform management
-- Subscription management
-- Tenant lifecycle operations
-- Support access functionality
-- Any action affecting multiple tenants
+```
+Support Agent → Request Limited Access
+                    ↓
+              Super Admin Reviews
+                    ↓
+         Yes ────────────── No
+          ↓                   ↓
+   Grant Limited    Deny / Reject
+   Write Access
+```
 
-### Dual Approval Required
+**Requirements:**
+- Request must include justification
+- Approval must be by different person
+- Audit logged
 
-- Impersonation for support
-- Permanent tenant deletion
-- Financial data access
-- Audit log export
+### Retention Configuration
 
-### Single Approval Sufficient
+```
+User → Request Retention Change
+              ↓
+        Approval Required
+              ↓
+   Yes ──────────── No
+    ↓              ↓
+ Apply Change   Deny
+    ↓
+    Audit Log
+```
 
-- Standard platform operations
-- Subscription changes
-- Tenant activation/suspension
-- Support session creation
+**Requirements:**
+- Must specify exact retention period
+- Minimum: 1 year, Maximum: 10 years
+- Change logged with approver
+
+### MFA Admin Reset
+
+**Two-Step Verification Required:**
+1. Standard MFA verification
+2. Separate approval for admin actions
 
 ---
 
 ## Implementation Notes
 
-1. Permissions are checked at the controller level
-2. Policies enforce both role and tenant context
-3. All permission checks are logged for audit
-4. UI elements are hidden based on permissions
-5. API validation enforces the same permissions as UI
+1. All permissions checked at controller/service level
+2. Policies enforce both role and MFA status
+3. Tenant isolation enforced at database level
+4. All actions logged for audit
+5. Support sessions auto-expire after 2 hours
+6. Cross-tenant metadata queries limited to name/ID/status
 
 ---
 
-**Status:** Specification in progress — IMPLEMENTATION BLOCKED  
+## Unresolved Questions
+
+1. **Limited Write Allowlist:** What specific operations? (Requires user approval)
+2. **Department Administrators:** Included or excluded? (Defined as excluded in Phase 10)
+3. **Retention Configuration:** Who can configure? (Requires user specification)
+4. **Support Request Initiation:** Can institution admins request? (Requires clarification)
+5. **MFA Methods:** Required method or any method? (Requires specification)
+
+---
+
+**Status:** Specification in progress — BLOCKED  
 **Next:** Await user review and explicit implementation approval

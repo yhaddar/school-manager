@@ -1,63 +1,242 @@
-# Verification Strategy
+# TEST.md — Phase 10 Super Admin Test Strategy
 
-**Status:** Active strategy. The Laravel foundation currently has eight executed smoke, authentication and tenant-context tests; all other coverage remains planned until its corresponding slice is implemented.
+**Status:** Specification draft — Implementation BLOCKED
+**PD-005 Compliance:** All
+**Last Updated:** 2026-11-08
 
-## 1. Test pyramid and environments
+## 1. Test Pyramid
 
-| Layer | Scope | Evidence |
-|---|---|---|
-| Unit | services/use cases, value objects, policies, calculations, mappers | fast deterministic tests |
-| Laravel feature/integration | HTTP validation/auth/policies, migrations, transactions, jobs, storage adapters | isolated PostgreSQL/Redis-compatible environment |
-| API contract | OpenAPI validation, generated Postman collection examples/assertions, backward compatibility | local contract and collection CI |
-| Flutter | view models, repositories, widgets, localization/RTL, navigation and accessibility semantics | `flutter test` / device profiles |
-| E2E | critical role journeys over API + app | seeded disposable environment, no production data |
-| Security/performance/recovery | negative authorization, rate limits, dependencies, load targets, backups/restore | documented test runs and reports |
+- Unit tests: 70%
+- Integration tests: 20%
+- E2E tests: 10%
 
-## 2. Mandatory critical scenarios
+## 2. Unit Tests
 
-1. User from Institution A cannot read, update, download, search, export, receive a job result for, or guess an object from Institution B.
-2. A Super Admin routine path has no tenant-content access; any later PD-005-approved exceptional path requires explicit authorization and audit evidence.
-3. Account activation rejects expired, reused, malformed or rate-limited temporary credentials/invitations without disclosing account existence.
-4. Parent only sees explicit linked children and loses access immediately after link removal/deactivation.
-5. Timetable transaction rejects overlapping professor, room/equipment and class/group allocations under concurrent attempts.
-6. Attendance batch is idempotent and reflects authorization at submit time; out-of-date records give a recoverable conflict response.
-7. Assessment grade/average/report-card rules are exact, published data is versioned/audited, and correction policy is enforced.
-8. Payment callback requires provider signature/verification; duplicate/out-of-order callbacks do not duplicate ledger state or receipts.
-9. File paths/URLs cannot be used without current authorization; malformed/malicious uploads are quarantined/rejected.
-10. Offline read cache is labelled; online-only actions cannot queue; permitted outbox items retry idempotently and display conflict outcomes.
+### 2.1 Services
+- PlatformService tests
+- InstitutionService tests
+- SubscriptionService tests
+- SupportService tests
+- MfaService tests
 
-## 3. API and contract checks
+### 2.2 Policies
+- SuperAdminPolicy tests
+- InstitutionPolicy tests
+- SupportPolicy tests
 
-OpenAPI is proposed as the authoritative artifact. The generated Postman collection must cover representative success, validation, unauthenticated, forbidden, cross-tenant, pagination, concurrency/idempotency and error examples. CI validates spec syntax, collection schema, example/spec agreement and runs collection assertions against a disposable environment. Live provider tests are separately labelled and only run after the user supplies non-production-safe credentials/configuration.
+### 2.3 Validation
+- Request validation tests
+- DTO validation tests
 
-## 4. Security quality gates
+## 3. Integration Tests
 
-- Static analysis, formatter/linter, dependency/license/secret scan on each change.
-- Authorization matrix tests for each endpoint/resource/action, including property-level serialization tests.
-- Rate-limit and enumeration-resistance tests on login, activation, invitation and password-recovery-like operations.
-- Input validation, mass-assignment, upload, SSRF/external-integration and audit-redaction tests.
-- Threat-model review before auth, payments, exports, messaging, file or tenant-architecture changes.
-- No test may weaken tenant isolation, skip a failing behavior or use production credentials/data.
+### 3.1 API Endpoints
+- All CRUD operations
+- Authentication
+- Authorization
+- MFA verification
+- Rate limiting
 
-## 5. Mobile/UI verification
+### 3.2 Database
+- Migration tests
+- Relationship tests
+- Constraint tests
+- Query tests
 
-Widget and integration tests cover loading, empty, error, success, offline and permission-denied states. Test screen reader labels, focus ordering/restoration, minimum touch areas, semantic state, text scaling, light/dark contrast, phone/tablet portrait/landscape and Arabic RTL. The executable thresholds and device/accessibility matrix are in `PROTOTYPE.md`; each implemented UI slice must attach evidence for every applicable row. Run critical journeys on Android and iOS simulators/devices when available; report unavailable hardware/OS proof honestly.
+### 3.3 External Services
+- Email notifications
+- Audit logging
 
-## 6. Performance, reliability and recovery
+## 4. Security Tests
 
-Before production, set approved SLOs and load profiles. Measure high-volume attendance submissions, timetable conflict writes, search/report queries, notification fan-out and exports. Confirm pagination/index plans, queue retries/dead letters, idempotency and observability. Run encrypted-backup restoration into an isolated environment and document achieved RPO/RTO; a successful backup without a restore test is insufficient.
+### 4.1 Authentication
+- MFA bypass attempts
+- Session hijacking
+- Token expiry
+- Password policy
 
-## 7. Acceptance criteria
+### 4.2 Authorization
+- Non-Super Admin access denial
+- Permission checks
+- Role escalation
+- Approval bypass
 
-- Every FD-001–FD-050 maps to one or more implementation tasks and relevant tests through `TRACEABILITY.md`; task-level endpoint/test identifiers are added before the corresponding task begins.
-- All relevant automated checks pass; no critical/high security finding remains accepted without an approved risk exception.
-- Negative tenant/access tests pass for APIs, jobs, storage, search, exports and client cache.
-- Contract, mobile and backend integration evidence is distinguished from mocked/provider evidence.
-- Changes receive code review, documentation update and local commit before any user-approved push.
+### 4.3 Tenant Isolation
+- Metadata-only access
+- Cross-tenant access denial
+- Support session isolation
 
-## Executed evidence
+## 5. Functional Test Scenarios
 
-- 2026-11-05: `backend/php artisan test --compact` passed: 8 tests / 37 assertions, including server-derived tenant context, missing membership denial, opaque token storage, refresh-reuse revocation, logout revocation and login throttling.
-- 2026-11-05: `backend/php artisan migrate:fresh --seed` completed against local SQLite.
-- 2026-11-05: `backend/php artisan migrate --force` applied the `api_sessions` and `audit_events` migrations to local SQLite; `backend/vendor/bin/pint --dirty --format agent` passed.
-- Not established: PostgreSQL, jobs, files, mobile, browser/device, provider or production verification.
+### 5.1 Institution Lifecycle
+1. Create institution
+2. Activate institution
+3. Suspend institution
+4. Reactivate institution
+5. Archive institution
+6. Restore institution
+
+### 5.2 Subscription Management
+1. Create subscription plan
+2. Assign plan to institution
+3. Upgrade plan
+4. Downgrade plan
+5. Renew subscription
+6. Grace period enforcement
+7. Suspension after grace period
+
+### 5.3 Support Access
+1. Create support request
+2. Approve request
+3. Grant read-only access
+4. Grant limited write access (approved)
+5. Audit all actions
+6. Session expiry
+
+## 6. Test Data
+
+### 6.1 Fixtures
+- Super Admin user
+- Subscription plans
+- Institutions (various statuses)
+- Support requests
+
+### 6.2 Factories
+- InstitutionFactory
+- SubscriptionPlanFactory
+- SupportRequestFactory
+- SupportSessionFactory
+
+## 7. Edge Cases
+
+### 7.1 Institution
+- Create duplicate name
+- Archive active institution with users
+- Restore expired retention
+- Suspend already suspended
+
+### 7.2 Subscription
+- Renew past expiry
+- Upgrade during grace period
+- Assign inactive plan
+- Zero price plan
+
+### 7.3 Support
+- Approve already approved request
+- Access expired session
+- Limited Write without approval
+- Multiple concurrent sessions
+
+## 8. Negative Tests
+
+### 8.1 Unauthorized Access
+- Non-Super Admin access
+- Missing MFA
+- Expired token
+- Invalid permissions
+
+### 8.2 Invalid Data
+- Invalid institution ID
+- Invalid dates
+- Missing required fields
+- Malformed requests
+
+### 8.3 Business Rules
+- Archive with active users
+- Delete assigned plan
+- Support access to wrong institution
+- Metadata leakage
+
+## 9. Performance Tests
+
+### 9.1 Load Tests
+- 100 concurrent Super Admin users
+- 1000 institution listings
+- Search performance
+- Audit log queries
+
+### 9.2 Stress Tests
+- Bulk operations
+- Large dataset queries
+- Session management
+
+## 10. Accessibility Tests
+
+### 10.1 WCAG 2.2 AA
+- Keyboard navigation
+- Screen reader labels
+- Color contrast
+- Focus indicators
+
+## 11. Security Test Cases
+
+### 11.1 MFA Enforcement
+- Login without MFA
+- Bypassing MFA check
+- MFA recovery abuse
+
+### 11.2 Tenant Isolation
+- Access institution users
+- Query cross-tenant data
+- Support session leakage
+
+### 11.3 Audit
+- Tamper audit logs
+- Missing audit events
+- Audit log deletion
+
+## 12. Test Coverage
+
+### 12.1 Requirements
+- Unit test coverage: >80%
+- Integration test coverage: >70%
+- Critical paths: 100%
+
+### 12.2 Exclusions
+- Third-party libraries
+- Configuration files
+- Generated code
+
+## 13. Test Execution
+
+### 13.1 CI/CD
+- Automated unit tests on commit
+- Integration tests on PR
+- E2E tests on release
+
+### 13.2 Manual Tests
+- VoiceOver testing
+- Security review
+- User acceptance
+
+## 14. Test Environment
+
+### 14.1 Setup
+- Isolated test database
+- Test Super Admin accounts
+- Mock external services
+- Seed test data
+
+### 14.2 Data
+- Test institutions
+- Test subscriptions
+- Test support requests
+- No production data
+
+## 15. Unresolved Questions
+
+1. **Test Coverage Target:** Acceptable coverage percentage?
+2. **E2E Tools:** Playwright or Cypress?
+3. **MFA Testing:** How to test without SMS?
+4. **Performance Targets:** Specific numbers?
+5. **Security Testing:** Penetration testing required?
+
+## 16. Acceptance Criteria
+
+- All unit tests pass
+- All integration tests pass
+- Security tests pass
+- Performance targets met
+- Coverage requirements met
+- Manual tests completed
+
