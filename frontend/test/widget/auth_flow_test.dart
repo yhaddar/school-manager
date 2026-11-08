@@ -255,4 +255,57 @@ void main() {
       expect(parentUser.isParent, isTrue);
     });
   });
+
+  group('Login Screen Route Determination Tests', () {
+    test('Super Admin user from API should have isSuperAdmin true', () {
+      // This simulates the actual API response for a Super Admin user
+      final user = User.fromJson({
+        'id': 1,
+        'name': 'Super Admin',
+        'email': 'superadmin@schoolmanager.test',
+        'username': 'superadmin',
+        'user_type': 'staff',
+        'is_active': true,
+        'active_institution_id': 1,
+        'membership_role': 'super-admin',
+      });
+
+      // Verify the user has the correct role
+      expect(user.isSuperAdmin, isTrue, reason: 'User from Super Admin API response should have isSuperAdmin = true');
+      expect(user.membershipRole, MembershipRole.superAdmin);
+    });
+
+    test('Admin user from API should have isAdmin true', () {
+      final user = User.fromJson({
+        'id': 2,
+        'name': 'Admin User',
+        'email': 'admin@test.com',
+        'username': 'admin',
+        'user_type': 'staff',
+        'is_active': true,
+        'active_institution_id': 1,
+        'membership_role': 'administrator',
+      });
+
+      expect(user.isAdmin, isTrue);
+      expect(user.membershipRole, MembershipRole.administrator);
+    });
+
+    test('Student user from API should have isStudent true even with null membership_role', () {
+      final user = User.fromJson({
+        'id': 3,
+        'name': 'Student User',
+        'email': 'student@test.com',
+        'username': 'student',
+        'user_type': 'student',
+        'is_active': true,
+        'active_institution_id': 1,
+        'membership_role': null,
+      });
+
+      expect(user.isStudent, isTrue);
+      expect(user.membershipRole, isNull);
+      expect(user.hasValidRole, isTrue, reason: 'Student should have valid role based on userType');
+    });
+  });
 }
