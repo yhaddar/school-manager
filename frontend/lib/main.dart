@@ -197,6 +197,14 @@ class SchoolManagerApp extends StatelessWidget {
               Locale('fr'),
               Locale('ar'),
             ],
+            builder: (context, child) {
+              final locale = Localizations.localeOf(context);
+              final isRtl = locale.languageCode == 'ar';
+              return Directionality(
+                textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
+                child: child!,
+              );
+            },
           );
         },
       ),

@@ -54,6 +54,9 @@ class AuthService {
         return const AuthApiResult(isAuthenticated: false);
       }
 
+      // Set the token on the apiClient before making the request
+      apiClient.setToken(token);
+
       final response = await apiClient.get('/api/v1/user');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
