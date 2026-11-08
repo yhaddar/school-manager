@@ -23,6 +23,7 @@ import '../screens/student/results_screen.dart' as student_results;
 import '../screens/parent/home_screen.dart' as parent;
 import '../screens/parent/more_screen.dart' as parent_more;
 import '../screens/super_admin/home_screen.dart' as super_admin;
+import '../screens/search/search_screen.dart' as search;
 import '../screens/communication/notifications_screen.dart' as comm_notifications;
 import '../screens/communication/messages_screen.dart' as comm_messages;
 import '../screens/communication/calendar_events_screen.dart' as comm_calendar;
@@ -41,6 +42,11 @@ class AppRouter {
     GetPage(
       name: '/',
       page: () => const LoginScreen(),
+    ),
+    // Global search route
+    GetPage(
+      name: '/search',
+      page: () => const search.SearchScreen(),
     ),
     // Super Admin routes
     GetPage(
