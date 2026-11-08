@@ -46,17 +46,13 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (response.success) {
-      // Navigate to the user's role-based home after login
       final user = authProvider.user;
       final targetRoute = _determineTargetRoute(user);
-      // Navigate to target route if determined
       if (targetRoute != null) {
         Get.offAllNamed(targetRoute);
       } else if (user != null) {
-        // Fallback: navigate to admin home if user exists but role undetermined
         Get.offAllNamed('/admin/home');
       } else {
-        // Fallback: stay on login or show error if no valid role
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Unable to determine user role')),
         );
@@ -71,19 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _determineTargetRoute(User? user) {
     if (user == null) return null;
     
-    // Determine target route based on user's role/type
-    // Priority: membership role (admin/teacher/parent), then user_type (student)
-    if (user.isAdmin) {
-      return '/admin/home';
-    } else if (user.isTeacher) {
-      return '/professor/home';
-    } else if (user.isStudent) {
-      return '/student/home';
-    } else if (user.isParent) {
-      return '/parent/home';
-    }
+    if (user.isSuperAdmin) return '/super-admin/home';
+    if (user.isAdmin) return '/admin/home';
+    if (user.isTeacher) return '/professor/home';
+    if (user.isStudent) return '/student/home';
+    if (user.isParent) return '/parent/home';
     
-    // Default fallback - could be configured per institution
     return '/admin/home';
   }
 
@@ -100,7 +89,6 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Logo/Title
                 Icon(Iconsax.book, size: 64, color: AppTheme.primary),
                 const SizedBox(height: AppTheme.space24),
                 Text(
@@ -112,12 +100,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: AppTheme.space48),
 
-                // Email field
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                            prefixIcon: Icon(Iconsax.message, color: AppTheme.primary),
+                    prefixIcon: Icon(Iconsax.message, color: AppTheme.primary),
                     border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: AppTheme.primary),
@@ -131,8 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                        .hasMatch(value)) {
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
                     return null;
@@ -140,7 +126,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: AppTheme.space16),
 
-                // Password field
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
@@ -164,7 +149,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: AppTheme.space24),
 
-                // Login button
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -180,19 +164,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                // Error message
-                if (Provider.of<AuthProvider>(
-                      context,
-                      listen: false,
-                    ).errorMessage !=
-                    null)
+                if (Provider.of<AuthProvider>(context, listen: false).errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(top: AppTheme.space16),
                     child: Text(
-                      Provider.of<AuthProvider>(
-                        context,
-                        listen: false,
-                      ).errorMessage!,
+                      Provider.of<AuthProvider>(context, listen: false).errorMessage!,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                       ),
