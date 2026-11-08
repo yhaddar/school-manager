@@ -122,7 +122,7 @@ class NotificationTile extends StatelessWidget {
           ],
         ),
         trailing: notification.priority == 'urgent'
-            ? Icon(Iconsax.warning_2, color: Colors.orange, size: 20)
+            ? Icon(Iconsax.warning_2, color: AppTheme.warning, size: 20)
             : null,
         onTap: () {
           if (!notification.isRead) {

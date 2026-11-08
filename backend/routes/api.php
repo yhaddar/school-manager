@@ -25,6 +25,11 @@ use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\TimetableController;
+use App\Http\Controllers\Api\SearchController;
+use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ExportController;
+use App\Http\Controllers\Api\ImportController;
+
 use App\Http\Middleware\AuthenticateApiSession;
 use App\Http\Middleware\ResolveTenantContext;
 use App\Models\Institution;
@@ -132,7 +137,7 @@ Route::prefix('v1')->group(function (): void {
         Route::middleware(ResolveTenantContext::class)->get('management/notifications/{id}', [NotificationController::class, 'show']);
         Route::middleware(ResolveTenantContext::class)->put('management/notifications/{id}', [NotificationController::class, 'update']);
         Route::middleware(ResolveTenantContext::class)->delete('management/notifications/{id}', [NotificationController::class, 'destroy']);
-        Route::middleware(ResolveTenantContext::class)->get('management/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::middleware(ResolveTenantContext::class)->post('management/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
         Route::middleware(ResolveTenantContext::class)->post('management/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
 
         // Messages
@@ -141,7 +146,7 @@ Route::prefix('v1')->group(function (): void {
         Route::middleware(ResolveTenantContext::class)->get('management/messages/{id}', [MessageController::class, 'show']);
         Route::middleware(ResolveTenantContext::class)->put('management/messages/{id}', [MessageController::class, 'update']);
         Route::middleware(ResolveTenantContext::class)->delete('management/messages/{id}', [MessageController::class, 'destroy']);
-        Route::middleware(ResolveTenantContext::class)->get('management/messages/{id}/read', [MessageController::class, 'markAsRead']);
+        Route::middleware(ResolveTenantContext::class)->post('management/messages/{id}/read', [MessageController::class, 'markAsRead']);
         Route::middleware(ResolveTenantContext::class)->post('management/messages/mark-all-read', [MessageController::class, 'markAllAsRead']);
 
         // Calendar events
@@ -214,5 +219,28 @@ Route::prefix('v1')->group(function (): void {
         Route::middleware(ResolveTenantContext::class)->get('learning/grades/{grade}', [GradeController::class, 'show']);
         Route::middleware(ResolveTenantContext::class)->put('learning/grades/{grade}', [GradeController::class, 'update']);
         Route::middleware(ResolveTenantContext::class)->delete('learning/grades/{grade}', [GradeController::class, 'destroy']);
+
+        // Search
+        Route::middleware(ResolveTenantContext::class)->get('search', [SearchController::class, 'index']);
+
+        // Reports
+        Route::middleware(ResolveTenantContext::class)->get('management/reports', [ReportController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/reports', [ReportController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('management/reports/{report}', [ReportController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('management/reports/{report}', [ReportController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('management/reports/{report}', [ReportController::class, 'destroy']);
+        Route::middleware(ResolveTenantContext::class)->post('management/reports/{report}/generate', [ReportController::class, 'generate']);
+
+        // Exports
+        Route::middleware(ResolveTenantContext::class)->get('management/exports', [ExportController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/exports', [ExportController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('management/exports/{export}', [ExportController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->get('management/exports/{export}/download', [ExportController::class, 'download']);
+
+        // Imports
+        Route::middleware(ResolveTenantContext::class)->get('management/imports', [ImportController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/imports', [ImportController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->post('management/imports/{import}/validate', [ImportController::class, 'validateImport']);
+        Route::middleware(ResolveTenantContext::class)->post('management/imports/{import}/process', [ImportController::class, 'process']);
     });
 });

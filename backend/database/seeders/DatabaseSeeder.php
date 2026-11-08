@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             InstitutionSeeder::class,
             AcademicSetupSeeder::class,
             CommunicationSeeder::class,
+            ReportsExportsImportsSeeder::class,
         ]);
     }
 }

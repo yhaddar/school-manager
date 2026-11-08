@@ -240,7 +240,7 @@ class NotificationTest extends TestCase
     public function test_notification_not_found_returns_404(): void
     {
         $this->withToken($this->token)
-            ->getJson('/api/v1/communications/notifications/nonexistent')
+            ->getJson('/api/v1/communications/notifications/999999')
             ->assertNotFound();
     }
 

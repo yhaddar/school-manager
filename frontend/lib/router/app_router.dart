@@ -7,6 +7,9 @@ import '../screens/admin/people_screen.dart';
 import '../screens/admin/academics_screen.dart';
 import '../screens/admin/operations_screen.dart';
 import '../screens/admin/more_screen.dart';
+import '../screens/admin/reports_screen.dart' as admin_reports;
+import '../screens/admin/exports_screen.dart' as admin_exports;
+import '../screens/admin/imports_screen.dart' as admin_imports;
 import '../screens/professor/home_screen.dart' as professor;
 import '../screens/professor/more_screen.dart' as professor_more;
 import '../screens/professor/classes_screen.dart' as professor_classes;
@@ -54,6 +57,18 @@ class AppRouter {
     GetPage(
       name: '/admin/operations',
       page: () => const OperationsScreen(),
+    ),
+    GetPage(
+      name: '/admin/reports',
+      page: () => const admin_reports.ReportsScreen(),
+    ),
+    GetPage(
+      name: '/admin/exports',
+      page: () => const admin_exports.ExportsScreen(),
+    ),
+    GetPage(
+      name: '/admin/imports',
+      page: () => const admin_imports.ImportsScreen(),
     ),
     GetPage(
       name: '/admin/more',

@@ -195,7 +195,7 @@ class MessageTest extends TestCase
     public function test_message_not_found_returns_404(): void
     {
         $this->withToken($this->token)
-            ->getJson('/api/v1/communications/messages/nonexistent')
+            ->getJson('/api/v1/communications/messages/999999')
             ->assertNotFound();
     }
 }

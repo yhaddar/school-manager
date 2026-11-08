@@ -46,11 +46,15 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (response.success) {
-      // Navigate to the user's role-based home
+      // Navigate to the user's role-based home after login
       final user = authProvider.user;
       final targetRoute = _determineTargetRoute(user);
+      // Navigate to target route if determined
       if (targetRoute != null) {
         Get.offAllNamed(targetRoute);
+      } else if (user != null) {
+        // Fallback: navigate to admin home if user exists but role undetermined
+        Get.offAllNamed('/admin/home');
       } else {
         // Fallback: stay on login or show error if no valid role
         ScaffoldMessenger.of(context).showSnackBar(
@@ -67,17 +71,16 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _determineTargetRoute(User? user) {
     if (user == null) return null;
     
-    // Check if user has a valid role
-    if (user.hasValidRole) {
-      if (user.isAdmin) {
-        return '/admin/home';
-      } else if (user.isTeacher) {
-        return '/professor/home';
-      } else if (user.isStudent) {
-        return '/student/home';
-      } else if (user.isParent) {
-        return '/parent/home';
-      }
+    // Determine target route based on user's role/type
+    // Priority: membership role (admin/teacher/parent), then user_type (student)
+    if (user.isAdmin) {
+      return '/admin/home';
+    } else if (user.isTeacher) {
+      return '/professor/home';
+    } else if (user.isStudent) {
+      return '/student/home';
+    } else if (user.isParent) {
+      return '/parent/home';
     }
     
     // Default fallback - could be configured per institution
@@ -114,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: Icon(Iconsax.message, color: AppTheme.primary),
+                            prefixIcon: Icon(Iconsax.message, color: AppTheme.primary),
                     border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: AppTheme.primary),
