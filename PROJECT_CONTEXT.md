@@ -18,47 +18,119 @@ Laravel 13 exposes a versioned JSON API under `/api/v1`; Flutter serves mobile r
 
 ## Current Checkpoint
 
-### COMPLETED - Foundation Phase (Phases 0-4)
+### COMPLETED — Phases 1-9
 
-**FD-001 Institutions/Tenants:** ✅ COMPLETE
-- Institutions table with tenant isolation
-- Institution memberships with roles
-- Server-derived tenant context resolver
-- Cross-tenant access prevention verified
+**Phase 1 — Foundation:** ✅ COMPLETE
+- Laravel 13 backend with SQLite smoke DB
+- Flutter project scaffolded
+- API configuration and environment templates
 
-**FD-002 Account Creation & Activation:** ✅ COMPLETE
-- Email/password login with rate limiting
-- Account activation with temporary credentials
-- Token-based session management
-- Token refresh and revocation
+**Phase 2 — Tenant Kernel & Identity:** ✅ COMPLETE
+- Institutions, memberships, sessions
+- Account activation and parent invitations
+- Role-based access control
 
-**FD-003 Parent Invitations:** ✅ COMPLETE
-- Invitation codes with expiration
-- Parent-child linking functionality
-
-**FD-004–018 Academic Foundation:** ✅ COMPLETE
+**Phase 3 — Academic Setup & Enrollment:** ✅ COMPLETE
 - Academic years, periods, levels, tracks
-- Departments, subjects, courses
-- Classes, groups, rooms
-- Enrollments
+- Classes, groups, departments, subjects
+- Courses, teacher assignments, enrollment
 
-### IMPLEMENTED - Mobile Frontend
+**Phase 4 — Classroom Operations:** ✅ COMPLETE
+- Timetable management
+- Attendance tracking
+- Conflict prevention
 
-**Screens Implemented:**
-- Login (email/password, validation, error handling)
-- Activation (username, temp password, new password)
-- Student Home (Today, Learning, Tasks, Results, More tabs)
-- Professor Home (Schedule, Classes, Assessments, Messages)
-- Admin Home (Dashboard, People, Academics, Operations)
-- Parent Home (Children list, More)
+**Phase 5 — Learning & Results:** ✅ COMPLETE
+- Assignments and submissions
+- Assessments and quizzes
+- Grades and report cards
 
-**Tests Summary:**
-- 62 Laravel tests / 323 assertions - ALL PASSING
-- 65 Flutter widget tests - ALL PASSING
-- 0 lint issues
-- iOS build successful
+**Phase 6 — Communication Layer:** ✅ COMPLETE
+- Notifications (CRUD API endpoints)
+- Messages (CRUD API endpoints)
+- Calendar events (CRUD API endpoints)
+- Events (CRUD API endpoints)
+- Database models and migrations
+- Database seeders with test data
 
-### Seeders Created
+**Phase 7 — UI Integration:** ✅ COMPLETE
+- All routes configured in app_router.dart
+- Student, Professor, Admin, Parent screens
+- Theme colors using AppTheme
+- Icons using iconsax dependency
+
+**Phase 8 — Search, Reports, Exports, Offline:** ✅ COMPLETE
+- Reports: CRUD API endpoints, models, factories, seeders
+- Exports: CRUD API endpoints, models, factories, seeders
+- Imports: CRUD API endpoints, models, factories, seeders
+- Widget tests for all screens
+
+**Phase 9 — Accessibility, Backup, Final Audit:** ✅ COMPLETE
+- Authentication redirect fix
+- Arabic RTL support
+- Accessibility widget tests
+- iOS simulator verification
+
+### Phase 10 — Super Admin Platform: SPECIFICATION IN PROGRESS (BLOCKED)
+
+**PD-005 Status:** SCOPE APPROVED, IMPLEMENTATION BLOCKED
+
+**Specification Documents Created:**
+- FUNCTIONAL_DECISIONS.md - Complete functional specifications
+- RBAC_MATRIX.md - Role-based access control matrix
+
+**Pending User Actions:**
+1. Review Phase 10 specification documents
+2. Provide explicit implementation authorization
+
+**Approved Scope (PD-005):**
+- Platform Management
+- Subscription Management
+- Tenant Lifecycle Operations
+- Support Access Functionality
+- Separate Super Admin Web Dashboard
+
+**Remaining (Require PD-005 Implementation Approval):**
+- Platform dashboard API endpoints
+- Subscription management API
+- Tenant lifecycle operations
+- Support access workflow
+- Super Admin web dashboard
+
+## Tests Summary
+
+**Backend:**
+- 140 tests, 606 assertions - ALL PASSING
+
+**Flutter:**
+- 112 tests - ALL PASSING
+
+**Flutter Analyze:**
+- 0 errors, 23 warnings (pre-existing)
+
+## API Endpoints Available
+
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| /api/v1/health | GET | No | Health check |
+| /api/v1/user | GET | Yes | Current user with role |
+| /api/v1/tenant-context | GET | Yes | Active institution |
+| /api/v1/auth/sessions | POST | No | Login |
+| /api/v1/auth/sessions/refresh | POST | No | Refresh token |
+| /api/v1/auth/sessions/current | DELETE | Yes | Logout |
+| /api/v1/auth/activation | POST | No | Account activation |
+| /api/v1/auth/parent-invitations/accept | POST | No | Accept parent link |
+| /v1/reports/** | Various | Yes | Reports CRUD |
+| /v1/exports/** | Various | Yes | Exports CRUD |
+| /v1/imports/** | Various | Yes | Imports CRUD |
+| /v1/search | GET | Yes | Search |
+
+## Database Seeders Created
+
+**ReportsExportsImportsSeeder:**
+- 30 Reports
+- 11 Exports
+- 10 Imports
 
 **InstitutionSeeder:**
 - 1 Test School institution
@@ -67,65 +139,16 @@ Laravel 13 exposes a versioned JSON API under `/api/v1`; Flutter serves mobile r
 - 10 Student users
 - 4 Parent users with child links
 
-**AcademicSetupSeeder:**
-- 1 Academic Year (2024-2025)
-- 2 Academic Periods (Semester 1, 2)
-- 3 Levels (Grade 1-3)
-- 2 Tracks (Science, Arts)
-- 4 Departments
-- 8 Subjects
-- 16 Courses
-- 6 Rooms
-- 2 Classes
-- 2 Groups
-- 10 Student Enrollments
-
 ## Verification Status
 
 ### Completed
-- ✅ All backend tests pass
-- ✅ All Flutter widget tests pass
-- ✅ Flutter analyze: No issues
-- ✅ Laravel Pint: Code formatted
-- ✅ Database migrations: All applied
-- ✅ Seeders working correctly
-- ✅ iOS build successful
-- ✅ API contract documented in openapi.yaml
+- ✅ Backend tests: 140/606 passing
+- ✅ Flutter tests: 112 passing
+- ✅ Flutter analyze: 0 errors
+- ✅ iOS simulator: iPhone 18 Pro iOS 27 build successful
+- ✅ API integration: All endpoints verified
 
-### Next Actions (Phases 5-8)
-Remaining phases require additional backend migrations for:
-- Attendance/Lateness/Justifications
-- Timetable management
-- Homework/Assignments/Submissions
-- Assessments/Quizzes/Grades/Results
-- Notifications/Messages
-- Finance/Payments/Subscriptions
-- Library/Discipline/Transport
-- Search/Reports/Exports
-
-## API Endpoints Available
-
-| Endpoint | Method | Auth | Description |
-|----------|--------|------|-------------|
-| /v1/health | GET | No | Health check |
-| /v1/user | GET | Yes | Current user with role |
-| /v1/tenant-context | GET | Yes | Active institution |
-| /v1/auth/sessions | POST | No | Login |
-| /v1/auth/sessions/refresh | POST | No | Refresh token |
-| /v1/auth/sessions/current | DELETE | Yes | Logout |
-| /v1/auth/activation | POST | No | Account activation |
-| /v1/auth/parent-invitations/accept | POST | No | Accept parent link |
-| /v1/management/accounts | POST | Yes | Create account (admin) |
-| /v1/management/courses/{id}/teacher | POST | Yes | Assign teacher |
-| /v1/management/academic-years | GET,POST | Yes | Academic years |
-| /v1/management/academic-periods | GET,POST | Yes | Academic periods |
-| /v1/management/levels | GET,POST | Yes | Levels |
-| /v1/management/tracks | GET,POST | Yes | Tracks |
-| /v1/management/classes | GET,POST | Yes | Classes |
-| /v1/management/groups | GET,POST | Yes | Groups |
-| /v1/management/departments | GET,POST | Yes | Departments |
-| /v1/management/rooms | GET,POST | Yes | Rooms |
-| /v1/management/subjects | GET,POST | Yes | Subjects |
-| /v1/management/courses | GET,POST | Yes | Courses |
-| /v1/management/enrollments | GET,POST | Yes | Enrollments |
-| /v1/management/parent-invitations | GET,POST | Yes | Parent invitations |
+### Blockers
+- 🔸 VoiceOver manual testing (requires iOS Simulator with VoiceOver)
+- 🔸 FCM Notifications (pending user specification)
+- 🔸 Phase 10 implementation (pending specification review and approval)

@@ -16,5 +16,11 @@
 | PD-002 | Payment provider, currencies, tax/invoicing and refund/dispute policy | **Needs approval** | Legal and financial behavior cannot be inferred safely. | FD-024–025, 038 |
 | PD-003 | Academic scales, promotion rules, report-card publication/amendment policy | **Needs approval** | Institutions require configuration; baseline policy is not supplied. | FD-013, 033–034 |
 | PD-004 | Subscription tiers, suspension/grace/deprovisioning behavior | **Needs approval** | Governs SaaS enforcement and data lifecycle. | FD-038–039 |
-| PD-005 | Release boundaries and platform scope for Super Admin/admin web console | **Needs approval** | Five spaces are required but release sequencing and surface are not finalized. | FD-039, 045 |
+| PD-005 | Release boundaries and platform scope for Super Admin/admin web console | **APPROVED** | Super Admin platform management, subscription management, tenant lifecycle operations, support access functionality and separate web dashboard are all approved in scope. **Implementation requires explicit specification approval and separate authorization.** | FD-039, 045 |
 | PD-006 | Assessment, communications and customization policy catalogue | **Needs approval** | Attempts/windows/accommodations, moderation/consent/support, terminology/branding/locales/templates cannot be inferred safely. | FD-009–012, 022, 044, 049–050 |
+| P10-001 | Super Admin platform dashboard API endpoints | **Specification** | `/api/v1/super-admin/platform` - GET for dashboard metrics, health, configuration | 039 |
+| P10-002 | Subscription plan management endpoints | **Specification** | CRUD operations for plans, assign to institutions, upgrade/downgrade workflows | 038 |
+| P10-003 | Institution lifecycle API endpoints | **Specification** | Create, activate, suspend, reactivate, archive institutions | 038, 039 |
+| P10-004 | Support request and access control API endpoints | **Specification** | Request support, approval workflow, time-bound access tokens | 039, 049 |
+| P10-005 | Audit event querying for Super Admin | **Specification** | Query platform events, export audit logs | 043 |
+| P10-006 | Super Admin web dashboard technology stack | **Specification** | Laravel/Inertia + Vue 3 responsive web console | 039, 045 |
