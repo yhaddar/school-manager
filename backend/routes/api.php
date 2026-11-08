@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ExportController;
 use App\Http\Controllers\Api\ImportController;
+use App\Http\Controllers\Api\SuperAdmin\InstitutionController;
 
 use App\Http\Middleware\AuthenticateApiSession;
 use App\Http\Middleware\ResolveTenantContext;
@@ -42,6 +43,15 @@ Route::prefix('v1')->group(function (): void {
     Route::post('auth/sessions/refresh', [AuthSessionController::class, 'refresh']);
     Route::post('auth/activation', [AccountActivationController::class, 'store']);
     Route::post('auth/parent-invitations/accept', [ParentInvitationController::class, 'accept']);
+
+    // Super Admin routes - outside tenant context, requires platform-permission
+    Route::middleware(AuthenticateApiSession::class)->group(function (): void {
+        Route::get('super-admin/institutions', [InstitutionController::class, 'index']);
+        Route::post('super-admin/institutions', [InstitutionController::class, 'store']);
+        Route::get('super-admin/institutions/{institution}', [InstitutionController::class, 'show']);
+        Route::put('super-admin/institutions/{institution}', [InstitutionController::class, 'update']);
+        Route::delete('super-admin/institutions/{institution}', [InstitutionController::class, 'destroy']);
+    });
 
     Route::middleware(AuthenticateApiSession::class)->group(function (): void {
         Route::delete('auth/sessions/current', [AuthSessionController::class, 'destroy']);

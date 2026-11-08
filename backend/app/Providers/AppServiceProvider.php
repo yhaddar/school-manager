@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Enums\InstitutionPermission;
 use App\Enums\InstitutionRole;
+use App\Enums\PlatformPermission;
 use App\Enums\UserAccountType;
 use App\Models\CalendarEvent;
 use App\Models\Event;
@@ -38,6 +39,25 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Message::class, MessagePolicy::class);
         Gate::policy(CalendarEvent::class, CalendarEventPolicy::class);
         Gate::policy(Event::class, EventPolicy::class);
+
+        Gate::define('platform-permission', function ($user, string $permission): bool {
+            $permissionEnum = PlatformPermission::tryFrom($permission);
+
+            if ($permissionEnum === null) {
+                return false;
+            }
+
+            // Super Admin has all platform permissions
+            if ($permissionEnum === PlatformPermission::SuperAdmin) {
+                return $user->user_type === UserAccountType::Staff
+                    && $user->institutionMemberships()
+                        ->where('role', 'super-admin')
+                        ->where('is_active', true)
+                        ->exists();
+            }
+
+            return $user->can('platform-permission', PlatformPermission::SuperAdmin->value);
+        });
 
         Gate::define('institution-permission', function ($user, string $permission): bool {
             $permissionEnum = InstitutionPermission::tryFrom($permission);

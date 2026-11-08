@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum InstitutionRole: string
 {
+    case SuperAdmin = 'super-admin';
     case Director = 'director';
     case Administrator = 'administrator';
     case Teacher = 'teacher';
@@ -15,6 +16,10 @@ enum InstitutionRole: string
     /** @return list<string> */
     public function permissions(): array
     {
+        if ($this === self::SuperAdmin) {
+            return array_map(fn ($p) => $p->value, PlatformPermission::cases());
+        }
+
         return match ($this) {
             self::Director, self::Administrator => [
                 InstitutionPermission::ManageAccounts->value,
@@ -33,6 +38,10 @@ enum InstitutionRole: string
 
     public function canProvision(): bool
     {
+        if ($this === self::SuperAdmin) {
+            return true;
+        }
+
         return in_array(InstitutionPermission::ProvisionAccounts->value, $this->permissions(), true);
     }
 }

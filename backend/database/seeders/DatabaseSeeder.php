@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         // Order matters for dependencies
         $this->call([
+            PlatformSeeder::class,
             InstitutionSeeder::class,
             AcademicSetupSeeder::class,
             CommunicationSeeder::class,
