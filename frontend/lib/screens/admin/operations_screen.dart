@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+
+import '../../main.dart';
 
 class OperationsScreen extends StatelessWidget {
   const OperationsScreen({super.key});
@@ -6,20 +9,23 @@ class OperationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.canvas,
       appBar: AppBar(
+        backgroundColor: AppTheme.surface,
+        foregroundColor: AppTheme.onSurface,
+        elevation: 0,
         title: const Text('Operations'),
-        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: const Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(AppTheme.space16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Operations Management',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: AppTextTheme.h1,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: AppTheme.space16),
             _OperationsGrid(),
           ],
         ),
@@ -31,15 +37,15 @@ class OperationsScreen extends StatelessWidget {
 class _OperationsGrid extends StatelessWidget {
   const _OperationsGrid();
 
-  static const _operationItems = [
-    {'title': 'Attendance', 'icon': Icons.event_note, 'color': Color(0xFF1D4ED8)},
-    {'title': 'Fees', 'icon': Icons.payment, 'color': Color(0xFF0F766E)},
-    {'title': 'Payments', 'icon': Icons.account_balance, 'color': Color(0xFF92400E)},
-    {'title': 'Documents', 'icon': Icons.description, 'color': Color(0xFF8B5CF6)},
-    {'title': 'Reports', 'icon': Icons.bar_chart, 'color': Color(0xFFEF4444)},
-    {'title': 'Discipline', 'icon': Icons.warning, 'color': Color(0xFFF59E0B)},
-    {'title': 'Library', 'icon': Icons.menu_book, 'color': Color(0xFF3B82F6)},
-    {'title': 'Transport', 'icon': Icons.directions_bus, 'color': Color(0xFF10B981)},
+  static final List<Map<String, dynamic>> _operationItems = [
+    {'title': 'Attendance', 'icon': Iconsax.calendar, 'color': AppTheme.info},
+    {'title': 'Fees', 'icon': Iconsax.money, 'color': AppTheme.primary},
+    {'title': 'Payments', 'icon': Iconsax.wallet, 'color': AppTheme.warning},
+    {'title': 'Documents', 'icon': Iconsax.document, 'color': AppTheme.info},
+    {'title': 'Reports', 'icon': Iconsax.chart, 'color': AppTheme.danger},
+    {'title': 'Discipline', 'icon': Iconsax.warning_2, 'color': AppTheme.warning},
+    {'title': 'Library', 'icon': Iconsax.book, 'color': AppTheme.info},
+    {'title': 'Transport', 'icon': Iconsax.bus, 'color': AppTheme.success},
   ];
 
   @override
@@ -64,16 +70,16 @@ class _OperationsGrid extends StatelessWidget {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(AppTheme.space16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(item['icon'] as IconData, size: 32, color: item['color'] as Color),
-                    const SizedBox(height: 12),
+                    Icon((item['icon'] as IconData), size: 32, color: (item['color'] as Color)),
+                    const SizedBox(height: AppTheme.space12),
                     Text(
                       item['title'] as String,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: AppTextTheme.title.copyWith(color: AppTheme.onSurface),
                     ),
                   ],
                 ),

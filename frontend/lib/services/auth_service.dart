@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -44,10 +45,7 @@ class AuthService {
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userIdKey = 'user_id';
 
-  AuthService({
-    required this.apiClient,
-    required this.sharedPreferences,
-  });
+  AuthService({required this.apiClient, required this.sharedPreferences});
 
   Future<AuthApiResult> getCurrentUser() async {
     try {
@@ -60,7 +58,7 @@ class AuthService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final user = User.fromJson(data['data']);
-        
+
         final tenantResponse = await apiClient.get('/api/v1/tenant-context');
         TenantContext? tenantContext;
         if (tenantResponse.statusCode == 200) {
@@ -90,12 +88,22 @@ class AuthService {
     return await _secureStorage.read(key: _tokenKey);
   }
 
-  Future<void> _saveTokens(String accessToken, String refreshToken, 
-      DateTime accessExpiry, DateTime refreshExpiry) async {
+  Future<void> _saveTokens(
+    String accessToken,
+    String refreshToken,
+    DateTime accessExpiry,
+    DateTime refreshExpiry,
+  ) async {
     await _secureStorage.write(key: _tokenKey, value: accessToken);
     await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
-    await sharedPreferences.setString('access_expiry', accessExpiry.toIso8601String());
-    await sharedPreferences.setString('refresh_expiry', refreshExpiry.toIso8601String());
+    await sharedPreferences.setString(
+      'access_expiry',
+      accessExpiry.toIso8601String(),
+    );
+    await sharedPreferences.setString(
+      'refresh_expiry',
+      refreshExpiry.toIso8601String(),
+    );
     apiClient.setToken(accessToken);
   }
 
@@ -108,17 +116,20 @@ class AuthService {
 
   Future<AuthResponse> login(String email, String password) async {
     try {
-      final response = await apiClient.post('/api/v1/auth/sessions', body: {
-        'email': email,
-        'password': password,
-      });
+      final response = await apiClient.post(
+        '/api/v1/auth/sessions',
+        body: {'email': email, 'password': password},
+      );
 
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
         final tokenData = data['data'];
-        
-        final accessTokenExpiry = DateTime.parse(tokenData['access_expires_at']);
-        final refreshTokenExpiry = DateTime.parse(tokenData['refresh_expires_at']);
+        final accessTokenExpiry = DateTime.parse(
+          tokenData['access_expires_at'],
+        );
+        final refreshTokenExpiry = DateTime.parse(
+          tokenData['refresh_expires_at'],
+        );
 
         await _saveTokens(
           tokenData['access_token'],
@@ -135,16 +146,10 @@ class AuthService {
           refreshExpiry: refreshTokenExpiry,
         );
       } else {
-        return AuthResponse(
-          success: false,
-          message: 'Invalid credentials',
-        );
+        return AuthResponse(success: false, message: 'Invalid credentials');
       }
     } catch (e) {
-      return AuthResponse(
-        success: false,
-        message: 'Network error',
-      );
+      return AuthResponse(success: false, message: 'Network error');
     }
   }
 
@@ -154,19 +159,26 @@ class AuthService {
     required String password,
   }) async {
     try {
-      final response = await apiClient.post('/api/v1/auth/activation', body: {
-        'username': username,
-        'temporary_password': temporaryPassword,
-        'password': password,
-        'password_confirmation': password,
-      });
+      final response = await apiClient.post(
+        '/api/v1/auth/activation',
+        body: {
+          'username': username,
+          'temporary_password': temporaryPassword,
+          'password': password,
+          'password_confirmation': password,
+        },
+      );
 
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
         final tokenData = data['data'];
-        
-        final accessTokenExpiry = DateTime.parse(tokenData['access_expires_at']);
-        final refreshTokenExpiry = DateTime.parse(tokenData['refresh_expires_at']);
+
+        final accessTokenExpiry = DateTime.parse(
+          tokenData['access_expires_at'],
+        );
+        final refreshTokenExpiry = DateTime.parse(
+          tokenData['refresh_expires_at'],
+        );
 
         await _saveTokens(
           tokenData['access_token'],
@@ -190,25 +202,27 @@ class AuthService {
         );
       }
     } catch (e) {
-      return AuthResponse(
-        success: false,
-        message: 'Network error',
-      );
+      return AuthResponse(success: false, message: 'Network error');
     }
   }
 
   Future<AuthResponse> refreshToken(String refreshToken) async {
     try {
-      final response = await apiClient.post('/api/v1/auth/sessions/refresh', body: {
-        'refresh_token': refreshToken,
-      });
+      final response = await apiClient.post(
+        '/api/v1/auth/sessions/refresh',
+        body: {'refresh_token': refreshToken},
+      );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final tokenData = data['data'];
-        
-        final accessTokenExpiry = DateTime.parse(tokenData['access_expires_at']);
-        final refreshTokenExpiry = DateTime.parse(tokenData['refresh_expires_at']);
+
+        final accessTokenExpiry = DateTime.parse(
+          tokenData['access_expires_at'],
+        );
+        final refreshTokenExpiry = DateTime.parse(
+          tokenData['refresh_expires_at'],
+        );
 
         await _saveTokens(
           tokenData['access_token'],
@@ -226,17 +240,11 @@ class AuthService {
         );
       } else {
         await clearTokens();
-        return AuthResponse(
-          success: false,
-          message: 'Session expired',
-        );
+        return AuthResponse(success: false, message: 'Session expired');
       }
     } catch (e) {
       await clearTokens();
-      return AuthResponse(
-        success: false,
-        message: 'Network error',
-      );
+      return AuthResponse(success: false, message: 'Network error');
     }
   }
 

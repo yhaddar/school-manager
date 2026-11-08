@@ -28,8 +28,16 @@ class ApiClient {
     return headers;
   }
 
-  Future<http.Response> get(String endpoint) async {
+  Uri _buildUri(String endpoint, [Map<String, String>? queryParameters]) {
     final uri = Uri.parse('$baseUrl$endpoint');
+    if (queryParameters != null && queryParameters.isNotEmpty) {
+      return uri.replace(queryParameters: queryParameters);
+    }
+    return uri;
+  }
+
+  Future<http.Response> get(String endpoint, {Map<String, String>? queryParameters}) async {
+    final uri = _buildUri(endpoint, queryParameters);
     return _client.get(uri, headers: _getDefaultHeaders());
   }
 

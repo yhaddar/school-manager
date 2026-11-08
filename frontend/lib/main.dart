@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -134,64 +135,70 @@ class SchoolManagerApp extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp.router(
-        title: 'School Manager',
-        debugShowCheckedModeBanner: false,
-        routerConfig: AppRouter.router,
-        theme: ThemeData.light().copyWith(
-          colorScheme: ColorScheme.light(
-            surface: AppTheme.surface,
-            onSurface: AppTheme.onSurface,
-            primary: AppTheme.primary,
-            onPrimary: AppTheme.onPrimary,
-          ),
-          scaffoldBackgroundColor: AppTheme.canvas,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: AppTheme.surface,
-            foregroundColor: AppTheme.onSurface,
-            elevation: 1,
-          ),
-          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-            backgroundColor: AppTheme.surface,
-            selectedItemColor: AppTheme.primary,
-            unselectedItemColor: AppTheme.muted,
-          ),
-          cardTheme: CardThemeData(
-            color: AppTheme.surface,
-            elevation: 1,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radius8),
+      child: Builder(
+        builder: (context) {
+          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          return GetMaterialApp(
+            title: 'School Manager',
+            debugShowCheckedModeBanner: false,
+            getPages: AppRouter.pages,
+            initialRoute: AppRouter.getInitialRoute(authProvider),
+            theme: ThemeData.light().copyWith(
+              colorScheme: ColorScheme.light(
+                surface: AppTheme.surface,
+                onSurface: AppTheme.onSurface,
+                primary: AppTheme.primary,
+                onPrimary: AppTheme.onPrimary,
+              ),
+              scaffoldBackgroundColor: AppTheme.canvas,
+              appBarTheme: const AppBarTheme(
+                backgroundColor: AppTheme.surface,
+                foregroundColor: AppTheme.onSurface,
+                elevation: 1,
+              ),
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: AppTheme.surface,
+                selectedItemColor: AppTheme.primary,
+                unselectedItemColor: AppTheme.muted,
+              ),
+              cardTheme: CardThemeData(
+                color: AppTheme.surface,
+                elevation: 1,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppTheme.radius8),
+                ),
+              ),
+              textTheme: const TextTheme(
+                displayLarge: AppTextTheme.display,
+                bodyLarge: AppTextTheme.body,
+                bodyMedium: AppTextTheme.small,
+                labelLarge: AppTextTheme.label,
+                labelSmall: AppTextTheme.caption,
+              ),
             ),
-          ),
-          textTheme: const TextTheme(
-            displayLarge: AppTextTheme.display,
-            bodyLarge: AppTextTheme.body,
-            bodyMedium: AppTextTheme.small,
-            labelLarge: AppTextTheme.label,
-            labelSmall: AppTextTheme.caption,
-          ),
-        ),
-        darkTheme: ThemeData.dark().copyWith(
-          colorScheme: ColorScheme.dark(
-            surface: AppTheme.darkSurface,
-            onSurface: AppTheme.darkOnSurface,
-            primary: AppTheme.darkPrimary,
-            onPrimary: AppTheme.darkOnPrimary,
-          ),
-          scaffoldBackgroundColor: AppTheme.darkCanvas,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: AppTheme.darkSurface,
-            foregroundColor: AppTheme.darkOnSurface,
-            elevation: 1,
-          ),
-        ),
-        themeMode: ThemeMode.system,
-        locale: const Locale('en'),
-        supportedLocales: const [
-          Locale('en'),
-          Locale('fr'),
-          Locale('ar'),
-        ],
+            darkTheme: ThemeData.dark().copyWith(
+              colorScheme: ColorScheme.dark(
+                surface: AppTheme.darkSurface,
+                onSurface: AppTheme.darkOnSurface,
+                primary: AppTheme.darkPrimary,
+                onPrimary: AppTheme.darkOnPrimary,
+              ),
+              scaffoldBackgroundColor: AppTheme.darkCanvas,
+              appBarTheme: const AppBarTheme(
+                backgroundColor: AppTheme.darkSurface,
+                foregroundColor: AppTheme.darkOnSurface,
+                elevation: 1,
+              ),
+            ),
+            themeMode: ThemeMode.system,
+            locale: const Locale('en'),
+            supportedLocales: const [
+              Locale('en'),
+              Locale('fr'),
+              Locale('ar'),
+            ],
+          );
+        },
       ),
     );
   }

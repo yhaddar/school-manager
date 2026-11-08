@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../providers/auth_provider.dart';
+import '../../main.dart';
 
 class ActivateScreen extends StatefulWidget {
   const ActivateScreen({super.key});
@@ -48,7 +50,19 @@ class _ActivateScreenState extends State<ActivateScreen> {
     });
 
     if (response.success) {
-      context.go('/home');
+      // Navigate to the user's role-based home
+      final user = authProvider.user;
+      if (user != null) {
+        if (user.isAdmin) {
+          Get.offAllNamed('/admin/home');
+        } else if (user.isTeacher) {
+          Get.offAllNamed('/professor/home');
+        } else if (user.isStudent) {
+          Get.offAllNamed('/student/home');
+        } else if (user.isParent) {
+          Get.offAllNamed('/parent/home');
+        }
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(response.message ?? 'Activation failed')),
@@ -59,28 +73,31 @@ class _ActivateScreenState extends State<ActivateScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Activate Account'),
-      ),
+      backgroundColor: AppTheme.canvas,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(AppTheme.space16),
           child: Form(
             key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Activate your account',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: AppTextTheme.h1.copyWith(color: AppTheme.onSurface),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppTheme.space24),
                 TextFormField(
                   controller: _usernameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Username',
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: Icon(Iconsax.user_square, color: AppTheme.primary),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppTheme.primary),
+                    ),
                   ),
+                  style: TextStyle(color: AppTheme.onSurface),
                   enabled: !_isLoading,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -89,13 +106,18 @@ class _ActivateScreenState extends State<ActivateScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 TextFormField(
                   controller: _tempPasswordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Temporary Password',
-                    prefixIcon: Icon(Icons.lock),
+                    prefixIcon: Icon(Iconsax.lock, color: AppTheme.primary),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppTheme.primary),
+                    ),
                   ),
+                  style: TextStyle(color: AppTheme.onSurface),
                   obscureText: true,
                   enabled: !_isLoading,
                   validator: (value) {
@@ -105,13 +127,18 @@ class _ActivateScreenState extends State<ActivateScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 TextFormField(
                   controller: _newPasswordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'New Password',
-                    prefixIcon: Icon(Icons.lock_outline),
+                    prefixIcon: Icon(Iconsax.lock, color: AppTheme.primary),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppTheme.primary),
+                    ),
                   ),
+                  style: TextStyle(color: AppTheme.onSurface),
                   obscureText: true,
                   enabled: !_isLoading,
                   validator: (value) {
@@ -124,13 +151,18 @@ class _ActivateScreenState extends State<ActivateScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppTheme.space16),
                 TextFormField(
                   controller: _confirmPasswordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Confirm Password',
-                    prefixIcon: Icon(Icons.lock_outline),
+                    prefixIcon: Icon(Iconsax.lock, color: AppTheme.primary),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppTheme.primary),
+                    ),
                   ),
+                  style: TextStyle(color: AppTheme.onSurface),
                   obscureText: true,
                   enabled: !_isLoading,
                   validator: (value) {
@@ -140,12 +172,16 @@ class _ActivateScreenState extends State<ActivateScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppTheme.space24),
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _submit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: AppTheme.onPrimary,
+                    ),
                     child: _isLoading
                         ? const CircularProgressIndicator()
                         : const Text('Activate'),

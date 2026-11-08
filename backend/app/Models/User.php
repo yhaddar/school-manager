@@ -42,6 +42,11 @@ class User extends Authenticatable
         return $this->belongsTo(Institution::class, 'active_institution_id');
     }
 
+    public function getCurrentInstitutionAttribute()
+    {
+        return $this->activeInstitution;
+    }
+
     public function institutionMemberships(): HasMany
     {
         return $this->hasMany(InstitutionMembership::class);

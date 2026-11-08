@@ -15,6 +15,16 @@ use App\Http\Controllers\Api\ParentInvitationController;
 use App\Http\Controllers\Api\RoomController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TrackController;
+use App\Http\Controllers\Api\AttendanceController;
+use App\Http\Controllers\Api\AssignmentController;
+use App\Http\Controllers\Api\SubmissionController;
+use App\Http\Controllers\Api\AssessmentController;
+use App\Http\Controllers\Api\GradeController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\CalendarController;
+use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\TimetableController;
 use App\Http\Middleware\AuthenticateApiSession;
 use App\Http\Middleware\ResolveTenantContext;
 use App\Models\Institution;
@@ -87,5 +97,122 @@ Route::prefix('v1')->group(function (): void {
 
         Route::middleware(ResolveTenantContext::class)->get('management/enrollments', [EnrollmentController::class, 'index']);
         Route::middleware(ResolveTenantContext::class)->post('management/enrollments', [EnrollmentController::class, 'store']);
+
+        // Attendance
+        Route::middleware(ResolveTenantContext::class)->get('management/attendances', [AttendanceController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/attendances', [AttendanceController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->put('management/attendances/{attendance}', [AttendanceController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('management/attendances/{attendance}', [AttendanceController::class, 'destroy']);
+
+        // Timetable
+        Route::middleware(ResolveTenantContext::class)->get('management/timetables', [TimetableController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/timetables', [TimetableController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('management/timetables/{timetable}', [TimetableController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->delete('management/timetables/{timetable}', [TimetableController::class, 'destroy']);
+
+        // Assignment
+        Route::middleware(ResolveTenantContext::class)->get('management/assignments', [AssignmentController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/assignments', [AssignmentController::class, 'store']);
+
+        // Submission
+        Route::middleware(ResolveTenantContext::class)->get('management/submissions', [SubmissionController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/submissions', [SubmissionController::class, 'store']);
+
+        // Assessment
+        Route::middleware(ResolveTenantContext::class)->get('management/assessments', [AssessmentController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/assessments', [AssessmentController::class, 'store']);
+
+        // Grade
+        Route::middleware(ResolveTenantContext::class)->get('management/grades', [GradeController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/grades', [GradeController::class, 'store']);
+
+        // Notifications
+        Route::middleware(ResolveTenantContext::class)->get('management/notifications', [NotificationController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/notifications', [NotificationController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('management/notifications/{id}', [NotificationController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('management/notifications/{id}', [NotificationController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('management/notifications/{id}', [NotificationController::class, 'destroy']);
+        Route::middleware(ResolveTenantContext::class)->get('management/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::middleware(ResolveTenantContext::class)->post('management/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+
+        // Messages
+        Route::middleware(ResolveTenantContext::class)->get('management/messages', [MessageController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/messages', [MessageController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('management/messages/{id}', [MessageController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('management/messages/{id}', [MessageController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('management/messages/{id}', [MessageController::class, 'destroy']);
+        Route::middleware(ResolveTenantContext::class)->get('management/messages/{id}/read', [MessageController::class, 'markAsRead']);
+        Route::middleware(ResolveTenantContext::class)->post('management/messages/mark-all-read', [MessageController::class, 'markAllAsRead']);
+
+        // Calendar events
+        Route::middleware(ResolveTenantContext::class)->get('management/calendar-events', [CalendarController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/calendar-events', [CalendarController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('management/calendar-events/{id}', [CalendarController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('management/calendar-events/{id}', [CalendarController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('management/calendar-events/{id}', [CalendarController::class, 'destroy']);
+
+        // Events
+        Route::middleware(ResolveTenantContext::class)->get('management/events', [EventController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('management/events', [EventController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('management/events/{id}', [EventController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('management/events/{id}', [EventController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('management/events/{id}', [EventController::class, 'destroy']);
+
+        // Communication endpoints
+        Route::middleware(ResolveTenantContext::class)->get('communications/notifications', [NotificationController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('communications/notifications', [NotificationController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('communications/notifications/{id}', [NotificationController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('communications/notifications/{id}', [NotificationController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('communications/notifications/{id}', [NotificationController::class, 'destroy']);
+        Route::middleware(ResolveTenantContext::class)->post('communications/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::middleware(ResolveTenantContext::class)->post('communications/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+
+        Route::middleware(ResolveTenantContext::class)->get('communications/messages', [MessageController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('communications/messages', [MessageController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('communications/messages/{id}', [MessageController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('communications/messages/{id}', [MessageController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('communications/messages/{id}', [MessageController::class, 'destroy']);
+        Route::middleware(ResolveTenantContext::class)->post('communications/messages/{id}/read', [MessageController::class, 'markAsRead']);
+        Route::middleware(ResolveTenantContext::class)->post('communications/messages/mark-all-read', [MessageController::class, 'markAllAsRead']);
+
+        Route::middleware(ResolveTenantContext::class)->get('communications/calendar-events', [CalendarController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('communications/calendar-events', [CalendarController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('communications/calendar-events/{id}', [CalendarController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('communications/calendar-events/{id}', [CalendarController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('communications/calendar-events/{id}', [CalendarController::class, 'destroy']);
+
+        Route::middleware(ResolveTenantContext::class)->get('communications/events', [EventController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('communications/events', [EventController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('communications/events/{id}', [EventController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('communications/events/{id}', [EventController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('communications/events/{id}', [EventController::class, 'destroy']);
+
+        // Learning endpoints
+        Route::middleware(ResolveTenantContext::class)->get('learning/assignments', [AssignmentController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('learning/assignments', [AssignmentController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('learning/assignments/{assignment}', [AssignmentController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('learning/assignments/{assignment}', [AssignmentController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('learning/assignments/{assignment}', [AssignmentController::class, 'destroy']);
+
+        // Learning - Submissions
+        Route::middleware(ResolveTenantContext::class)->get('learning/submissions', [SubmissionController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('learning/submissions', [SubmissionController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('learning/submissions/{submission}', [SubmissionController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('learning/submissions/{submission}', [SubmissionController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('learning/submissions/{submission}', [SubmissionController::class, 'destroy']);
+
+        // Learning - Assessments
+        Route::middleware(ResolveTenantContext::class)->get('learning/assessments', [AssessmentController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('learning/assessments', [AssessmentController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('learning/assessments/{assessment}', [AssessmentController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('learning/assessments/{assessment}', [AssessmentController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('learning/assessments/{assessment}', [AssessmentController::class, 'destroy']);
+
+        // Learning - Grades
+        Route::middleware(ResolveTenantContext::class)->get('learning/grades', [GradeController::class, 'index']);
+        Route::middleware(ResolveTenantContext::class)->post('learning/grades', [GradeController::class, 'store']);
+        Route::middleware(ResolveTenantContext::class)->get('learning/grades/{grade}', [GradeController::class, 'show']);
+        Route::middleware(ResolveTenantContext::class)->put('learning/grades/{grade}', [GradeController::class, 'update']);
+        Route::middleware(ResolveTenantContext::class)->delete('learning/grades/{grade}', [GradeController::class, 'destroy']);
     });
 });

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../main.dart';
 
@@ -8,15 +9,19 @@ class AdminHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.canvas,
       appBar: AppBar(
+        backgroundColor: AppTheme.surface,
+        foregroundColor: AppTheme.onSurface,
+        elevation: 0,
         title: const Text('School Manager'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: Icon(Iconsax.direct_notification, color: AppTheme.onSurface),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.person),
+            icon: Icon(Iconsax.profile_circle, color: AppTheme.onSurface),
             onPressed: () {},
           ),
         ],
@@ -26,26 +31,27 @@ class AdminHomeScreen extends StatelessWidget {
           // Navigate based on selection
         },
         selectedIndex: 0,
+        backgroundColor: AppTheme.surface,
         destinations: const <Widget>[
           NavigationDestination(
-            selectedIcon: Icon(Icons.dashboard),
-            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Iconsax.activity, color: AppTheme.primary),
+            icon: Icon(Iconsax.activity, color: AppTheme.muted),
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.people_outlined),
+            icon: Icon(Iconsax.user_square, color: AppTheme.muted),
             label: 'People',
           ),
           NavigationDestination(
-            icon: Icon(Icons.school_outlined),
+            icon: Icon(Iconsax.book, color: AppTheme.muted),
             label: 'Academics',
           ),
           NavigationDestination(
-            icon: Icon(Icons.build_outlined),
+            icon: Icon(Iconsax.settings, color: AppTheme.muted),
             label: 'Operations',
           ),
           NavigationDestination(
-            icon: Icon(Icons.more_horiz_outlined),
+            icon: Icon(Iconsax.more, color: AppTheme.muted),
             label: 'More',
           ),
         ],
@@ -85,7 +91,7 @@ class AdminDashboard extends StatelessWidget {
                   child: _StatCard(
                     title: 'Students',
                     value: '1,248',
-                    icon: Icons.school,
+                    icon: Iconsax.book,
                     color: AppTheme.primary,
                   ),
                 ),
@@ -94,7 +100,7 @@ class AdminDashboard extends StatelessWidget {
                   child: _StatCard(
                     title: 'Teachers',
                     value: '84',
-                    icon: Icons.person,
+                    icon: Iconsax.user_square,
                     color: AppTheme.success,
                   ),
                 ),
@@ -107,7 +113,7 @@ class AdminDashboard extends StatelessWidget {
                   child: _StatCard(
                     title: 'Classes',
                     value: '32',
-                    icon: Icons.class_,
+                    icon: Iconsax.clock,
                     color: AppTheme.info,
                   ),
                 ),
@@ -116,7 +122,7 @@ class AdminDashboard extends StatelessWidget {
                   child: _StatCard(
                     title: 'Parent Links',
                     value: '1,182',
-                    icon: Icons.family_restroom,
+                    icon: Iconsax.user_square,
                     color: AppTheme.warning,
                   ),
                 ),
@@ -138,10 +144,11 @@ class AdminDashboard extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: 5,
                 itemBuilder: (context, index) {
-                  return const ListTile(
-                    leading: Icon(Icons.assignment_ind),
-                    title: Text('New student enrollment'),
-                    subtitle: Text('2 minutes ago'),
+                  return ListTile(
+                    leading: Icon(Iconsax.calendar, color: AppTheme.primary),
+                    title: Text('New student enrollment', style: TextStyle(color: AppTheme.onSurface)),
+                    subtitle: Text('2 minutes ago', style: TextStyle(color: AppTheme.muted)),
+                    trailing: Icon(Iconsax.arrow_right, color: AppTheme.muted),
                   );
                 },
               ),

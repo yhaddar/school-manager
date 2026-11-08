@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+
+import '../../main.dart';
 
 class AcademicsScreen extends StatelessWidget {
   const AcademicsScreen({super.key});
@@ -6,20 +9,23 @@ class AcademicsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.canvas,
       appBar: AppBar(
+        backgroundColor: AppTheme.surface,
+        foregroundColor: AppTheme.onSurface,
+        elevation: 0,
         title: const Text('Academics'),
-        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: const Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(AppTheme.space16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Academic Structure',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: AppTextTheme.h1,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: AppTheme.space16),
             _AcademicsGrid(),
           ],
         ),
@@ -31,17 +37,17 @@ class AcademicsScreen extends StatelessWidget {
 class _AcademicsGrid extends StatelessWidget {
   const _AcademicsGrid();
 
-  static const List<Map<String, dynamic>> _academicItems = [
-    {'title': 'Academic Years', 'icon': Icons.calendar_today},
-    {'title': 'Academic Periods', 'icon': Icons.event},
-    {'title': 'Levels', 'icon': Icons.school},
-    {'title': 'Tracks', 'icon': Icons.route},
-    {'title': 'Departments', 'icon': Icons.domain},
-    {'title': 'Classes', 'icon': Icons.class_outlined},
-    {'title': 'Groups', 'icon': Icons.group},
-    {'title': 'Subjects', 'icon': Icons.book},
-    {'title': 'Courses', 'icon':Icons.reviews},
-    {'title': 'Rooms', 'icon': Icons.chair},
+  static final List<Map<String, dynamic>> _academicItems = [
+    {'title': 'Academic Years', 'icon': Iconsax.calendar},
+    {'title': 'Academic Periods', 'icon': Iconsax.calendar_1},
+    {'title': 'Levels', 'icon': Iconsax.level},
+    {'title': 'Tracks', 'icon': Iconsax.book_1},
+    {'title': 'Departments', 'icon': Iconsax.category},
+    {'title': 'Classes', 'icon': Iconsax.clock},
+    {'title': 'Groups', 'icon': Iconsax.group},
+    {'title': 'Subjects', 'icon': Iconsax.book},
+    {'title': 'Courses', 'icon': Iconsax.clipboard},
+    {'title': 'Rooms', 'icon': Iconsax.location},
   ];
 
   @override
@@ -66,16 +72,16 @@ class _AcademicsGrid extends StatelessWidget {
                 );
               },
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(AppTheme.space16),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(item['icon'] as IconData, size: 32, color: Theme.of(context).colorScheme.primary),
-                    const SizedBox(height: 12),
+                    Icon((item['icon'] as IconData), size: 32, color: AppTheme.primary),
+                    const SizedBox(height: AppTheme.space12),
                     Text(
                       item['title'] as String,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      style: AppTextTheme.title.copyWith(color: AppTheme.onSurface),
                     ),
                   ],
                 ),

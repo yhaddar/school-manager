@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:iconsax/iconsax.dart';
 
+import '../../models/user.dart';
 import '../../providers/auth_provider.dart';
-import '../../main.dart'; // For AppTheme and AppTextTheme
+import '../../main.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -44,12 +46,42 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (response.success) {
-      context.go('/home');
+      // Navigate to the user's role-based home
+      final user = authProvider.user;
+      final targetRoute = _determineTargetRoute(user);
+      if (targetRoute != null) {
+        Get.offAllNamed(targetRoute);
+      } else {
+        // Fallback: stay on login or show error if no valid role
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to determine user role')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(response.message ?? 'Login failed')),
-    );
+        SnackBar(content: Text(response.message ?? 'Login failed')),
+      );
     }
+  }
+
+  String? _determineTargetRoute(User? user) {
+    if (user == null) return null;
+    
+    // Check if user has a valid role
+    if (user.hasValidRole) {
+      if (user.isAdmin) {
+        return '/admin/home';
+      } else if (user.isTeacher) {
+        return '/professor/home';
+      } else if (user.isStudent) {
+        return '/student/home';
+      } else if (user.isParent) {
+        return '/parent/home';
+      }
+    }
+    
+    // Default fallback - could be configured per institution
+    return '/admin/home';
   }
 
   @override
@@ -66,11 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Logo/Title
-                const Icon(
-                  Icons.school,
-                  size: 64,
-                  color: AppTheme.primary,
-                ),
+                Icon(Iconsax.book, size: 64, color: AppTheme.primary),
                 const SizedBox(height: AppTheme.space24),
                 Text(
                   'School Manager',
@@ -80,15 +108,19 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppTheme.space48),
-                
+
                 // Email field
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Iconsax.message, color: AppTheme.primary),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppTheme.primary),
+                    ),
                   ),
+                  style: TextStyle(color: AppTheme.onSurface),
                   keyboardType: TextInputType.emailAddress,
                   autofillHints: const [AutofillHints.email],
                   enabled: !_isLoading,
@@ -96,22 +128,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: AppTheme.space16),
-                
+
                 // Password field
                 TextFormField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Iconsax.lock, color: AppTheme.primary),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppTheme.primary),
+                    ),
                   ),
+                  style: TextStyle(color: AppTheme.onSurface),
                   obscureText: true,
                   autofillHints: const [AutofillHints.password],
                   enabled: !_isLoading,
@@ -123,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 const SizedBox(height: AppTheme.space24),
-                
+
                 // Login button
                 SizedBox(
                   width: double.infinity,
@@ -139,14 +176,23 @@ class _LoginScreenState extends State<LoginScreen> {
                         : const Text('Login'),
                   ),
                 ),
-                
+
                 // Error message
-                if (Provider.of<AuthProvider>(context, listen: false).errorMessage != null)
+                if (Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    ).errorMessage !=
+                    null)
                   Padding(
                     padding: const EdgeInsets.only(top: AppTheme.space16),
                     child: Text(
-                      Provider.of<AuthProvider>(context, listen: false).errorMessage!,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                      Provider.of<AuthProvider>(
+                        context,
+                        listen: false,
+                      ).errorMessage!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ),
               ],

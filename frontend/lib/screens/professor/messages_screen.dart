@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+
+import '../../main.dart';
 
 class ProfessorMessagesScreen extends StatelessWidget {
   const ProfessorMessagesScreen({super.key});
@@ -6,27 +9,38 @@ class ProfessorMessagesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.canvas,
       appBar: AppBar(
+        backgroundColor: AppTheme.surface,
+        foregroundColor: AppTheme.onSurface,
+        elevation: 0,
         title: const Text('Messages'),
-        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(AppTheme.space16),
         itemCount: 8,
         itemBuilder: (context, index) {
           final isUnread = index % 3 == 0;
           return Card(
-            margin: const EdgeInsets.only(bottom: 8),
+            margin: const EdgeInsets.only(bottom: AppTheme.space8),
             child: ListTile(
               leading: CircleAvatar(
-                child: Text('J'),
+                backgroundColor: AppTheme.primary,
+                child: Text('J', style: TextStyle(color: AppTheme.onPrimary)),
               ),
               title: Row(
                 children: [
-                  Text('John Smith'),
+                  Text('John Smith', style: TextStyle(color: AppTheme.onSurface)),
                   if (isUnread) ...[
-                    const SizedBox(width: 8),
-                    Icon(Icons.circle, size: 12, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: AppTheme.space8),
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                   ],
                 ],
               ),
@@ -36,8 +50,9 @@ class ProfessorMessagesScreen extends StatelessWidget {
                   : 'Hi Professor, can you review the assignment?',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: AppTheme.muted),
               ),
-              trailing: Text('${5 - index}h'),
+              trailing: Text('${5 - index}h', style: TextStyle(color: AppTheme.muted)),
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Navigate to message')),
@@ -48,12 +63,14 @@ class ProfessorMessagesScreen extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppTheme.primary,
+        foregroundColor: AppTheme.onPrimary,
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Compose new message')),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Iconsax.add),
       ),
     );
   }

@@ -35,23 +35,31 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    final userTypeValue = json['user_type']?.toString();
+    final userType = userTypeValue != null
+        ? UserAccountType.values.firstWhere(
+            (e) => e.name == userTypeValue,
+            orElse: () => UserAccountType.staff,
+          )
+        : UserAccountType.staff;
+
+    final membershipRoleValue = json['membership_role']?.toString();
+    final membershipRole = membershipRoleValue != null
+        ? MembershipRole.values.firstWhere(
+            (e) => e.name == membershipRoleValue,
+            orElse: () => MembershipRole.staff,
+          )
+        : null;
+
     return User(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      username: json['username'] as String,
-      userType: UserAccountType.values.firstWhere(
-        (e) => e.name == json['user_type'],
-        orElse: () => UserAccountType.staff,
-      ),
+      id: json['id'] as int? ?? 0,
+      name: json['name'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      userType: userType,
       isActive: json['is_active'] as bool? ?? true,
       activeInstitutionId: json['active_institution_id'] as int?,
-      membershipRole: json['membership_role'] != null
-          ? MembershipRole.values.firstWhere(
-              (e) => e.name == json['membership_role'],
-              orElse: () => MembershipRole.staff,
-            )
-          : null,
+      membershipRole: membershipRole,
     );
   }
 
@@ -59,6 +67,8 @@ class User {
   bool get isTeacher => membershipRole == MembershipRole.teacher;
   bool get isStudent => userType == UserAccountType.student;
   bool get isParent => userType == UserAccountType.parent;
+  
+  bool get hasValidRole => isAdmin || isTeacher || isStudent || isParent;
 }
 
 class TenantContext {

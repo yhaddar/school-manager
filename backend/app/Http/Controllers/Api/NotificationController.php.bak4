@@ -1,0 +1,121 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Api\Controller as ApiController;
+use App\Models\Notification;
+use Illuminate\Http\Request;
+
+class NotificationController extends Controller
+{
+    public function index(Request $request)
+    {
+        $this->authorize('viewAny', Notification::class);
+
+        $institutionId = $request->attributes->get('institution')->id;
+        $query = Notification::where('institution_id', $institutionId);
+
+        if ($request->has('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->has('is_read')) {
+            $query->where('is_read', $request->is_read);
+        }
+
+        return response()->json([
+            'data' => $query->latest()->paginate(20)
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $this->authorize('create', Notification::class);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'message' => 'required|string',
+            'type' => 'required|string',
+            'data' => 'sometimes|array',
+            'priority' => 'sometimes|in:low,medium,high,urgent',
+        ]);
+
+        $notification = Notification::create([
+            'institution_id' => $request->attributes->get('institution')->id,
+            'title' => $validated['title'],
+            'message' => $validated['message'],
+            'type' => $validated['type'],
+            'data' => $validated['data'] ?? [],
+            'priority' => $validated['priority'] ?? 'medium',
+            'is_read' => false,
+        ]);
+
+        return response()->json([
+            'data' => $notification
+        ], 201);
+    }
+
+    public function show(Request $request, Notification $notification)
+    {
+        $this->authorize('view', $notification);
+
+        return response()->json([
+            'data' => $notification
+        ]);
+    }
+
+    public function update(Request $request, Notification $notification)
+    {
+        $this->authorize('update', $notification);
+
+        $validated = $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'message' => 'sometimes|string',
+            'type' => 'sometimes|string',
+            'data' => 'sometimes|array',
+            'priority' => 'sometimes|in:low,medium,high,urgent',
+            'is_read' => 'sometimes|boolean',
+        ]);
+
+        $notification->update($validated);
+
+        return response()->json([
+            'data' => $notification
+        ]);
+    }
+
+    public function destroy(Request $request, Notification $notification)
+    {
+        $this->authorize('delete', $notification);
+
+        $notification->delete();
+
+        return response()->json([
+            'message' => 'Notification deleted successfully'
+        ]);
+    }
+
+    public function markAsRead(Request $request, Notification $notification)
+    {
+        $this->authorize('update', $notification);
+
+        $notification->update(['is_read' => true]);
+
+        return response()->json([
+            'data' => $notification
+        ]);
+    }
+
+    public function markAllAsRead(Request $request)
+    {
+        $this->authorize('updateAny', Notification::class);
+
+        Notification::where('institution_id', $request->attributes->get('institution')->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return response()->json([
+            'message' => 'All notifications marked as read'
+        ]);
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserAccountType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +31,8 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'user_type' => UserAccountType::Staff,
+            'is_active' => true,
         ];
     }
 
@@ -40,6 +43,26 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a student.
+     */
+    public function student(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_type' => UserAccountType::Student,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is a parent.
+     */
+    public function parent(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'user_type' => UserAccountType::Parent,
         ]);
     }
 }

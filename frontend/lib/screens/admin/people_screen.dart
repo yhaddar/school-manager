@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+
 import '../../main.dart';
 
 class PeopleScreen extends StatelessWidget {
@@ -7,11 +9,15 @@ class PeopleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.canvas,
       appBar: AppBar(
+        backgroundColor: AppTheme.surface,
+        foregroundColor: AppTheme.onSurface,
+        elevation: 0,
         title: const Text('People'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
+            icon: Icon(Iconsax.search_normal, color: AppTheme.onSurface),
             onPressed: () {
               // Show search
             },
@@ -23,27 +29,28 @@ class PeopleScreen extends StatelessWidget {
           // Navigate based on selection
         },
         selectedIndex: 1,
+        backgroundColor: AppTheme.surface,
         destinations: const <Widget>[
           NavigationDestination(
-            selectedIcon: Icon(Icons.dashboard),
-            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Iconsax.activity, color: AppTheme.primary),
+            icon: Icon(Iconsax.activity, color: AppTheme.muted),
             label: 'Home',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.people),
-            icon: Icon(Icons.people_outlined),
+            selectedIcon: Icon(Iconsax.user_square, color: AppTheme.primary),
+            icon: Icon(Iconsax.user_square, color: AppTheme.muted),
             label: 'People',
           ),
           NavigationDestination(
-            icon: Icon(Icons.school_outlined),
+            icon: Icon(Iconsax.book, color: AppTheme.muted),
             label: 'Academics',
           ),
           NavigationDestination(
-            icon: Icon(Icons.build_outlined),
+            icon: Icon(Iconsax.settings, color: AppTheme.muted),
             label: 'Operations',
           ),
           NavigationDestination(
-            icon: Icon(Icons.more_horiz_outlined),
+            icon: Icon(Iconsax.more, color: AppTheme.muted),
             label: 'More',
           ),
         ],
@@ -69,9 +76,9 @@ class PeopleListView extends StatelessWidget {
               style: AppTextTheme.h1.copyWith(color: AppTheme.onSurface),
             ),
             const SizedBox(height: AppTheme.space16),
-            const Text(
+            Text(
               'Search, filter, and manage staff, students, and parents.',
-              style: AppTextTheme.body,
+              style: AppTextTheme.body.copyWith(color: AppTheme.muted),
             ),
             const SizedBox(height: AppTheme.space24),
             Expanded(
@@ -109,12 +116,13 @@ class PersonListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: const CircleAvatar(
-          child: Icon(Icons.person),
+        leading: CircleAvatar(
+          backgroundColor: AppTheme.primary,
+          child: Icon(Iconsax.user_square, color: AppTheme.onPrimary),
         ),
-        title: Text(name),
-        subtitle: Text(' • '),
-        trailing: const Icon(Icons.chevron_right),
+        title: Text(name, style: TextStyle(color: AppTheme.onSurface)),
+        subtitle: Text('$role • $email', style: TextStyle(color: AppTheme.muted)),
+        trailing: Icon(Iconsax.arrow_right, color: AppTheme.muted),
         onTap: () {
           // Navigate to person profile
         },

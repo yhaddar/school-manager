@@ -5,8 +5,16 @@ namespace App\Providers;
 use App\Enums\InstitutionPermission;
 use App\Enums\InstitutionRole;
 use App\Enums\UserAccountType;
+use App\Models\CalendarEvent;
+use App\Models\Event;
 use App\Models\Institution;
+use App\Models\Message;
+use App\Models\Notification;
+use App\Policies\CalendarEventPolicy;
+use App\Policies\EventPolicy;
 use App\Policies\InstitutionPolicy;
+use App\Policies\MessagePolicy;
+use App\Policies\NotificationPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Institution::class, InstitutionPolicy::class);
+        Gate::policy(Notification::class, NotificationPolicy::class);
+        Gate::policy(Message::class, MessagePolicy::class);
+        Gate::policy(CalendarEvent::class, CalendarEventPolicy::class);
+        Gate::policy(Event::class, EventPolicy::class);
 
         Gate::define('institution-permission', function ($user, string $permission): bool {
             $permissionEnum = InstitutionPermission::tryFrom($permission);

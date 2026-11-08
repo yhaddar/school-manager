@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+
+import '../../main.dart';
 
 class RolesDelegationScreen extends StatelessWidget {
   const RolesDelegationScreen({super.key});
@@ -6,32 +9,35 @@ class RolesDelegationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.canvas,
       appBar: AppBar(
+        backgroundColor: AppTheme.surface,
+        foregroundColor: AppTheme.onSurface,
+        elevation: 0,
         title: const Text('Roles & Permissions'),
-        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: Column(
         children: [
           Container(
             width: double.infinity,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-            padding: const EdgeInsets.all(16.0),
-            child: const Text(
+            color: AppTheme.primary.withValues(alpha: 0.1),
+            padding: const EdgeInsets.all(AppTheme.space16),
+            child: Text(
               'Manage role assignments and permissions for staff and teachers',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              style: AppTextTheme.body.copyWith(color: AppTheme.onSurface),
             ),
           ),
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(AppTheme.space16),
               itemCount: 10,
               itemBuilder: (context, index) {
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
+                  margin: const EdgeInsets.only(bottom: AppTheme.space12),
                   child: ListTile(
-                    title: const Text('User Profile'),
-                    subtitle: const Text('Role: Admin'),
-                    trailing: const Icon(Icons.chevron_right),
+                    title: Text('User Profile', style: TextStyle(color: AppTheme.onSurface)),
+                    subtitle: Text('Role: Admin', style: TextStyle(color: AppTheme.muted)),
+                    trailing: Icon(Iconsax.arrow_right, color: AppTheme.muted),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Role management coming soon')),
@@ -45,12 +51,14 @@ class RolesDelegationScreen extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppTheme.primary,
+        foregroundColor: AppTheme.onPrimary,
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Create new role assignment')),
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Iconsax.add),
       ),
     );
   }

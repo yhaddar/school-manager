@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:iconsax/iconsax.dart';
 
+import '../../main.dart';
 import '../../providers/auth_provider.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -11,34 +13,37 @@ class MoreScreen extends StatelessWidget {
     final authProvider = Provider.of<AuthProvider>(context);
     
     return Scaffold(
+      backgroundColor: AppTheme.canvas,
       appBar: AppBar(
+        backgroundColor: AppTheme.surface,
+        foregroundColor: AppTheme.onSurface,
+        elevation: 0,
         title: const Text('More'),
-        backgroundColor: Theme.of(context).colorScheme.surface,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(AppTheme.space16),
         children: [
           const ListTile(
             title: Text('Settings'),
-            leading: Icon(Icons.settings),
-            trailing: Icon(Icons.chevron_right),
+            leading: Icon(Iconsax.settings, color: AppTheme.primary),
+            trailing: Icon(Iconsax.arrow_right, color: AppTheme.muted),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16, vertical: AppTheme.space8),
             child: Text(
               'Account',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: AppTheme.muted.withValues(alpha: 0.6),
                 letterSpacing: 0.5,
               ),
             ),
           ),
           ListTile(
-            title: const Text('Profile'),
-            leading: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
-            trailing: const Icon(Icons.chevron_right),
+            title: Text('Profile', style: TextStyle(color: AppTheme.onSurface)),
+            leading: Icon(Iconsax.profile_circle, color: AppTheme.primary),
+            trailing: Icon(Iconsax.arrow_right, color: AppTheme.muted),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Navigate to Profile')),
@@ -46,9 +51,9 @@ class MoreScreen extends StatelessWidget {
             },
           ),
           ListTile(
-            title: const Text('Sessions / Devices'),
-            leading: Icon(Icons.devices, color: Theme.of(context).colorScheme.primary),
-            trailing: const Icon(Icons.chevron_right),
+            title: Text('Sessions / Devices', style: TextStyle(color: AppTheme.onSurface)),
+            leading: Icon(Iconsax.devices, color: AppTheme.primary),
+            trailing: Icon(Iconsax.arrow_right, color: AppTheme.muted),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Navigate to Sessions')),
@@ -56,21 +61,21 @@ class MoreScreen extends StatelessWidget {
             },
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16, vertical: AppTheme.space8),
             child: Text(
               'Notifications',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: AppTheme.muted.withValues(alpha: 0.6),
                 letterSpacing: 0.5,
               ),
             ),
           ),
           ListTile(
-            title: const Text('Notification Preferences'),
-            leading: Icon(Icons.notifications, color: Theme.of(context).colorScheme.primary),
-            trailing: const Icon(Icons.chevron_right),
+            title: Text('Notification Preferences', style: TextStyle(color: AppTheme.onSurface)),
+            leading: Icon(Iconsax.direct_notification, color: AppTheme.primary),
+            trailing: Icon(Iconsax.arrow_right, color: AppTheme.muted),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Navigate to Notification Preferences')),
@@ -78,21 +83,21 @@ class MoreScreen extends StatelessWidget {
             },
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.space16, vertical: AppTheme.space8),
             child: Text(
               'Support',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: AppTheme.muted.withValues(alpha: 0.6),
                 letterSpacing: 0.5,
               ),
             ),
           ),
           ListTile(
-            title: const Text('Help / Support'),
-            leading: Icon(Icons.help, color: Theme.of(context).colorScheme.primary),
-            trailing: const Icon(Icons.chevron_right),
+            title: Text('Help / Support', style: TextStyle(color: AppTheme.onSurface)),
+            leading: Icon(Iconsax.support, color: AppTheme.primary),
+            trailing: Icon(Iconsax.arrow_right, color: AppTheme.muted),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Navigate to Help')),
@@ -101,8 +106,8 @@ class MoreScreen extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
-            title: const Text('Logout', style: TextStyle(color: Colors.red)),
-            leading: Icon(Icons.logout, color: Colors.red),
+            title: Text('Logout', style: TextStyle(color: AppTheme.danger)),
+            leading: Icon(Iconsax.logout, color: AppTheme.danger),
             onTap: () {
               authProvider.logout();
             },

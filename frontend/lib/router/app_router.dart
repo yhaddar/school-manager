@@ -1,97 +1,148 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-
-import '../providers/auth_provider.dart';
+import 'package:get/get.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/activate_screen.dart';
-import '../screens/admin/home_screen.dart' show AdminHomeScreen;
-import '../screens/admin/people_screen.dart' show PeopleScreen;
-import '../screens/admin/academics_screen.dart' show AcademicsScreen;
-import '../screens/admin/operations_screen.dart' show OperationsScreen;
-import '../screens/admin/more_screen.dart' show MoreScreen;
-import '../screens/professor/home_screen.dart' show ProfessorHomeScreen;
-import '../screens/student/home_screen.dart' show StudentHomeScreen;
-import '../screens/parent/home_screen.dart' show ParentHomeScreen;
+import '../screens/admin/home_screen.dart';
+import '../screens/admin/people_screen.dart';
+import '../screens/admin/academics_screen.dart';
+import '../screens/admin/operations_screen.dart';
+import '../screens/admin/more_screen.dart';
+import '../screens/professor/home_screen.dart' as professor;
+import '../screens/professor/more_screen.dart' as professor_more;
+import '../screens/professor/classes_screen.dart' as professor_classes;
+import '../screens/professor/assessments_screen.dart' as professor_assessments;
+import '../screens/professor/messages_screen.dart' as professor_messages;
+import '../screens/student/home_screen.dart' as student;
+import '../screens/student/more_screen.dart' as student_more;
+import '../screens/student/learning_screen.dart' as student_learning;
+import '../screens/student/tasks_screen.dart' as student_tasks;
+import '../screens/student/results_screen.dart' as student_results;
+import '../screens/parent/home_screen.dart' as parent;
+import '../screens/parent/more_screen.dart' as parent_more;
+import '../screens/communication/notifications_screen.dart' as comm_notifications;
+import '../screens/communication/messages_screen.dart' as comm_messages;
+import '../screens/communication/calendar_events_screen.dart' as comm_calendar;
+import '../providers/auth_provider.dart';
 
 class AppRouter {
-  static final GoRouter router = GoRouter(
-    initialLocation: '/login',
-    refreshListenable: _RouteRefreshListener(),
-    redirect: (BuildContext context, GoRouterState state) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final isLoggedIn = authProvider.isAuthenticated;
-      final location = state.uri.path;
+  static List<GetPage> pages = [
+    GetPage(
+      name: '/login',
+      page: () => const LoginScreen(),
+    ),
+    GetPage(
+      name: '/activate',
+      page: () => const ActivateScreen(),
+    ),
+    GetPage(
+      name: '/',
+      page: () => const LoginScreen(),
+    ),
+    // Admin routes
+    GetPage(
+      name: '/admin/home',
+      page: () => const AdminHomeScreen(),
+    ),
+    GetPage(
+      name: '/admin/people',
+      page: () => const PeopleScreen(),
+    ),
+    GetPage(
+      name: '/admin/academics',
+      page: () => const AcademicsScreen(),
+    ),
+    GetPage(
+      name: '/admin/operations',
+      page: () => const OperationsScreen(),
+    ),
+    GetPage(
+      name: '/admin/more',
+      page: () => const MoreScreen(),
+    ),
+    // Professor routes
+    GetPage(
+      name: '/professor/home',
+      page: () => const professor.ProfessorHomeScreen(),
+    ),
+    GetPage(
+      name: '/professor/classes',
+      page: () => const professor_classes.ProfessorClassesScreen(),
+    ),
+    GetPage(
+      name: '/professor/assessments',
+      page: () => const professor_assessments.ProfessorAssessmentsScreen(),
+    ),
+    GetPage(
+      name: '/professor/messages',
+      page: () => const professor_messages.ProfessorMessagesScreen(),
+    ),
+    GetPage(
+      name: '/professor/notifications',
+      page: () => const comm_notifications.NotificationsScreen(),
+    ),
+    GetPage(
+      name: '/professor/profile',
+      page: () => const professor_more.ProfessorMoreScreen(),
+    ),
+    GetPage(
+      name: '/professor/more',
+      page: () => const professor_more.ProfessorMoreScreen(),
+    ),
+    // Student routes
+    GetPage(
+      name: '/student/home',
+      page: () => const student.StudentHomeScreen(),
+    ),
+    GetPage(
+      name: '/student/learning',
+      page: () => const student_learning.LearningScreen(),
+    ),
+    GetPage(
+      name: '/student/tasks',
+      page: () => const student_tasks.TasksScreen(),
+    ),
+    GetPage(
+      name: '/student/results',
+      page: () => const student_results.ResultsScreen(),
+    ),
+    GetPage(
+      name: '/student/more',
+      page: () => const student_more.MoreScreen(),
+    ),
+    // Parent routes
+    GetPage(
+      name: '/parent/home',
+      page: () => const parent.ParentHomeScreen(),
+    ),
+    GetPage(
+      name: '/parent/more',
+      page: () => const parent_more.ParentMoreScreen(),
+    ),
+    // Communication routes (shared)
+    GetPage(
+      name: '/communications/notifications',
+      page: () => const comm_notifications.NotificationsScreen(),
+    ),
+    GetPage(
+      name: '/communications/messages',
+      page: () => const comm_messages.MessagesScreen(),
+    ),
+    GetPage(
+      name: '/communications/calendar-events',
+      page: () => const comm_calendar.CalendarEventsScreen(),
+    ),
+    GetPage(
+      name: '/communications/events',
+      page: () => const _EventsScreenPlaceholder(),
+    ),
+  ];
 
-      // If accessing protected routes while not authenticated
-      if (!isLoggedIn && location != '/login' && location != '/activate') {
-        return '/login';
-      }
-      
-      // If authenticated, redirect from login/activation to appropriate home
-      if (isLoggedIn && (location == '/login' || location == '/activate')) {
-        return _getHomeRoute(authProvider);
-      }
-
-      return null;
-    },
-    routes: [
-      GoRoute(
-        path: '/login',
-        name: 'login',
-        builder: (BuildContext context, GoRouterState state) => const LoginScreen(),
-      ),
-      GoRoute(
-        path: '/activate',
-        name: 'activate',
-        builder: (BuildContext context, GoRouterState state) => const ActivateScreen(),
-      ),
-      // Admin routes
-      GoRoute(
-        path: '/admin/home',
-        name: 'admin-home',
-        builder: (BuildContext context, GoRouterState state) => const AdminHomeScreen(),
-      ),
-      GoRoute(
-        path: '/admin/people',
-        name: 'admin-people',
-        builder: (BuildContext context, GoRouterState state) => const PeopleScreen(),
-      ),
-      GoRoute(
-        path: '/admin/academics',
-        name: 'admin-academics',
-        builder: (BuildContext context, GoRouterState state) => const AcademicsScreen(),
-      ),
-      GoRoute(
-        path: '/admin/operations',
-        name: 'admin-operations',
-        builder: (BuildContext context, GoRouterState state) => const OperationsScreen(),
-      ),
-      GoRoute(
-        path: '/admin/more',
-        name: 'admin-more',
-        builder: (BuildContext context, GoRouterState state) => const MoreScreen(),
-      ),
-      // Professor routes
-      GoRoute(
-        path: '/professor/home',
-        name: 'professor-home',
-        builder: (BuildContext context, GoRouterState state) => const ProfessorHomeScreen(),
-      ),
-      // Student routes
-      GoRoute(
-        path: '/student/home',
-        name: 'student-home',
-        builder: (BuildContext context, GoRouterState state) => const StudentHomeScreen(),
-      ),
-      // Parent routes
-      GoRoute(
-        path: '/parent/home',
-        name: 'parent-home',
-        builder: (BuildContext context, GoRouterState state) => const ParentHomeScreen(),
-      ),
-    ],
-  );
+  static String getInitialRoute(AuthProvider authProvider) {
+    if (authProvider.isAuthenticated) {
+      return _getHomeRoute(authProvider);
+    }
+    return '/login';
+  }
 
   static String _getHomeRoute(AuthProvider authProvider) {
     final user = authProvider.user;
@@ -104,11 +155,31 @@ class AppRouter {
     
     return '/login';
   }
+
+  static Future<String?> middlewareRedirect(String? currentRoute, AuthProvider authProvider) async {
+    final isLoggedIn = authProvider.isAuthenticated;
+    
+    if (!isLoggedIn && currentRoute != '/login' && currentRoute != '/activate') {
+      return '/login';
+    }
+    
+    if (isLoggedIn && (currentRoute == '/login' || currentRoute == '/activate')) {
+      return _getHomeRoute(authProvider);
+    }
+    
+    return null;
+  }
 }
 
-class _RouteRefreshListener extends ChangeNotifier {
+class _EventsScreenPlaceholder extends StatelessWidget {
+  const _EventsScreenPlaceholder();
+
   @override
-  void notifyListeners() {
-    super.notifyListeners();
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Text('Events Screen - Coming Soon'),
+      ),
+    );
   }
 }
