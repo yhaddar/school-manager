@@ -9,24 +9,22 @@ import 'package:school_manager/main.dart';
 
 void main() {
   group('Admin Screens Widget Tests', () {
-    testWidgets('PeopleScreen displays people directory', (WidgetTester tester) async {
+    testWidgets('PeopleScreen displays people directory', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: const PeopleScreen(),
-        ),
+        MaterialApp(theme: ThemeData.light(), home: const PeopleScreen()),
       );
 
       expect(find.text('People Directory'), findsOneWidget);
       expect(find.byType(Card), findsWidgets);
     });
 
-    testWidgets('AcademicsScreen displays academic grid', (WidgetTester tester) async {
+    testWidgets('AcademicsScreen displays academic grid', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: const AcademicsScreen(),
-        ),
+        MaterialApp(theme: ThemeData.light(), home: const AcademicsScreen()),
       );
 
       expect(find.text('Academics'), findsOneWidget);
@@ -34,12 +32,11 @@ void main() {
       expect(find.byType(GridView), findsOneWidget);
     });
 
-    testWidgets('OperationsScreen displays operations grid', (WidgetTester tester) async {
+    testWidgets('OperationsScreen displays operations grid', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: const OperationsScreen(),
-        ),
+        MaterialApp(theme: ThemeData.light(), home: const OperationsScreen()),
       );
 
       expect(find.text('Operations'), findsOneWidget);
@@ -47,7 +44,9 @@ void main() {
       expect(find.byType(GridView), findsOneWidget);
     });
 
-    testWidgets('RolesDelegationScreen displays role management', (WidgetTester tester) async {
+    testWidgets('RolesDelegationScreen displays role management', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
@@ -59,7 +58,9 @@ void main() {
       expect(find.byType(FloatingActionButton), findsOneWidget);
     });
 
-    testWidgets('PersonProfileScreen displays profile info', (WidgetTester tester) async {
+    testWidgets('PersonProfileScreen displays profile info', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.light(),
@@ -72,33 +73,26 @@ void main() {
       expect(find.text('Teacher'), findsOneWidget);
     });
 
-    testWidgets('Admin screens use correct theme colors', (WidgetTester tester) async {
+    testWidgets('Admin screens use correct theme colors', (
+      WidgetTester tester,
+    ) async {
       // PeopleScreen
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: const PeopleScreen(),
-        ),
+        MaterialApp(theme: ThemeData.light(), home: const PeopleScreen()),
       );
       var scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
       expect(scaffold.backgroundColor, equals(AppTheme.canvas));
 
       // AcademicsScreen
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: const AcademicsScreen(),
-        ),
+        MaterialApp(theme: ThemeData.light(), home: const AcademicsScreen()),
       );
       scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
       expect(scaffold.backgroundColor, equals(AppTheme.canvas));
 
       // OperationsScreen
       await tester.pumpWidget(
-        MaterialApp(
-          theme: ThemeData.light(),
-          home: const OperationsScreen(),
-        ),
+        MaterialApp(theme: ThemeData.light(), home: const OperationsScreen()),
       );
       scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
       expect(scaffold.backgroundColor, equals(AppTheme.canvas));

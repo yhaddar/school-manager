@@ -66,13 +66,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String? _determineTargetRoute(User? user) {
     if (user == null) return null;
-    
+
     if (user.isSuperAdmin) return '/super-admin/home';
     if (user.isAdmin) return '/admin/home';
     if (user.isTeacher) return '/professor/home';
     if (user.isStudent) return '/student/home';
     if (user.isParent) return '/parent/home';
-    
+
     return '/admin/home';
   }
 
@@ -118,7 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
                     return null;
@@ -164,11 +165,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                if (Provider.of<AuthProvider>(context, listen: false).errorMessage != null)
+                if (Provider.of<AuthProvider>(
+                      context,
+                      listen: false,
+                    ).errorMessage !=
+                    null)
                   Padding(
                     padding: const EdgeInsets.only(top: AppTheme.space16),
                     child: Text(
-                      Provider.of<AuthProvider>(context, listen: false).errorMessage!,
+                      Provider.of<AuthProvider>(
+                        context,
+                        listen: false,
+                      ).errorMessage!,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                       ),

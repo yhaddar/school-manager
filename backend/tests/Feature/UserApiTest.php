@@ -177,4 +177,31 @@ class UserApiTest extends TestCase
         $this->assertEquals('parent', $response->json('data.user_type'));
         $this->assertEquals('parent', $response->json('data.membership_role'));
     }
+
+    public function test_user_api_with_super_admin_user(): void
+    {
+        $institution = Institution::create(['name' => 'Platform Institution']);
+        $user = User::factory()->create([
+            'active_institution_id' => $institution->id,
+            'email_verified_at' => now(),
+        ]);
+        InstitutionMembership::create([
+            'institution_id' => $institution->id,
+            'user_id' => $user->id,
+            'role' => 'super-admin',
+            'is_active' => true,
+        ]);
+
+        $token = $this->postJson('/api/v1/auth/sessions', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertCreated()->json('data.access_token');
+
+        $response = $this->withToken($token)
+            ->getJson('/api/v1/user')
+            ->assertOk();
+
+        $this->assertEquals('staff', $response->json('data.user_type'));
+        $this->assertEquals('super-admin', $response->json('data.membership_role'));
+    }
 }

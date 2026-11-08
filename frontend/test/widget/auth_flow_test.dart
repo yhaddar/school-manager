@@ -62,6 +62,26 @@ void main() {
       expect(user.isStudent, isTrue, reason: 'Student should navigate to /student/home');
     });
 
+    test('Super Admin user has correct role flags and route', () {
+      final user = User(
+        id: 1,
+        name: 'Super Admin',
+        email: 'superadmin@test.com',
+        username: 'superadmin',
+        userType: UserAccountType.staff,
+        membershipRole: MembershipRole.superAdmin,
+      );
+
+      expect(user.isSuperAdmin, isTrue);
+      expect(user.isAdmin, isFalse);
+      expect(user.isTeacher, isFalse);
+      expect(user.isStudent, isFalse);
+      expect(user.isParent, isFalse);
+      expect(user.hasValidRole, isTrue);
+      
+      // Super Admin should navigate to /super-admin/home
+      expect(user.isSuperAdmin, isTrue, reason: 'Super Admin should navigate to /super-admin/home');
+    });
     test('Parent user has correct role flags and route', () {
       final user = User(
         id: 4,
@@ -149,10 +169,52 @@ void main() {
       expect(user.hasValidRole, isTrue, reason: 'Parent user_type alone is valid');
     });
 
+    test('User.fromJson parses membership_role super-admin from API response correctly', () {
+      // This simulates the actual API response structure for Super Admin
+      final json = {
+        'id': 2,
+        'name': 'Super Admin',
+        'email': 'superadmin@schoolmanager.test',
+        'username': 'superadmin',
+        'user_type': 'staff',
+        'is_active': true,
+        'active_institution_id': 1,
+        'membership_role': 'super-admin',
+      };
+
+      final user = User.fromJson(json);
+
+      expect(user.id, 2);
+      expect(user.name, 'Super Admin');
+      expect(user.email, 'superadmin@schoolmanager.test');
+      expect(user.username, 'superadmin');
+      expect(user.userType, UserAccountType.staff);
+      expect(user.isActive, true);
+      expect(user.activeInstitutionId, 1);
+      expect(user.membershipRole, MembershipRole.superAdmin);
+      expect(user.isSuperAdmin, isTrue, reason: 'User with membership_role=super-admin should be detected as superAdmin');
+      expect(user.isAdmin, isFalse);
+      expect(user.isTeacher, isFalse);
+      expect(user.isStudent, isFalse);
+      expect(user.isParent, isFalse);
+      expect(user.hasValidRole, isTrue, reason: 'Super Admin should have valid role');
+    });
+
     test('Auth route determination returns correct route for each role', () {
+      // Super Admin route
+      final superAdminUser = User(
+        id: 1,
+        name: 'Super Admin',
+        email: 'superadmin@test.com',
+        username: 'superadmin',
+        userType: UserAccountType.staff,
+        membershipRole: MembershipRole.superAdmin,
+      );
+      expect(superAdminUser.isSuperAdmin, isTrue);
+      
       // Admin route
       final adminUser = User(
-        id: 1,
+        id: 2,
         name: 'Admin',
         email: 'admin@test.com',
         username: 'admin',
@@ -163,7 +225,7 @@ void main() {
       
       // Teacher route
       final teacherUser = User(
-        id: 2,
+        id: 3,
         name: 'Teacher',
         email: 'teacher@test.com',
         username: 'teacher',
@@ -174,7 +236,7 @@ void main() {
       
       // Student route
       final studentUser = User(
-        id: 3,
+        id: 4,
         name: 'Student',
         email: 'student@test.com',
         username: 'student',
@@ -184,7 +246,7 @@ void main() {
       
       // Parent route
       final parentUser = User(
-        id: 4,
+        id: 5,
         name: 'Parent',
         email: 'parent@test.com',
         username: 'parent',

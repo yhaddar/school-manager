@@ -110,8 +110,18 @@ void main() {
     });
 
     test('User hasValidRole returns true for known roles', () {
-      final admin = User(
+      final superAdmin = User(
         id: 1,
+        name: 'Super Admin',
+        email: 'superadmin@example.com',
+        username: 'superadmin',
+        userType: UserAccountType.staff,
+        membershipRole: MembershipRole.superAdmin,
+      );
+      expect(superAdmin.hasValidRole, true);
+
+      final admin = User(
+        id: 2,
         name: 'Admin',
         email: 'admin@example.com',
         username: 'admin',
@@ -121,7 +131,7 @@ void main() {
       expect(admin.hasValidRole, true);
 
       final teacher = User(
-        id: 1,
+        id: 3,
         name: 'Teacher',
         email: 'teacher@example.com',
         username: 'teacher',
@@ -131,7 +141,7 @@ void main() {
       expect(teacher.hasValidRole, true);
 
       final student = User(
-        id: 1,
+        id: 4,
         name: 'Student',
         email: 'student@example.com',
         username: 'student',
@@ -140,7 +150,7 @@ void main() {
       expect(student.hasValidRole, true);
 
       final parent = User(
-        id: 1,
+        id: 5,
         name: 'Parent',
         email: 'parent@example.com',
         username: 'parent',
@@ -261,6 +271,31 @@ void main() {
       expect(user.isTeacher, isFalse);
       expect(user.isStudent, isFalse);
       expect(user.hasValidRole, isTrue, reason: 'Parent should have valid role');
+    });
+
+    test('parses actual API response for super-admin user', () {
+      final json = {
+        'id': 2,
+        'name': 'Super Admin',
+        'email': 'superadmin@test.com',
+        'username': 'superadmin',
+        'user_type': 'staff',
+        'is_active': true,
+        'active_institution_id': 1,
+        'membership_role': 'super-admin',
+      };
+
+      final user = User.fromJson(json);
+
+      expect(user.userType, UserAccountType.staff);
+      expect(user.membershipRole, MembershipRole.superAdmin);
+      
+      expect(user.isSuperAdmin, isTrue, reason: 'User with membership_role=super-admin should be detected as superAdmin');
+      expect(user.isAdmin, isFalse);
+      expect(user.isTeacher, isFalse);
+      expect(user.isStudent, isFalse);
+      expect(user.isParent, isFalse);
+      expect(user.hasValidRole, isTrue, reason: 'SuperAdmin should have valid role');
     });
   });
 }

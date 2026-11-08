@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:school_manager/screens/super_admin/home_screen.dart';
-import 'package:school_manager/main.dart';
+
 
 void main() {
   group('SuperAdminHomeScreen Widget Tests', () {
