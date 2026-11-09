@@ -1,10 +1,7 @@
-enum UserAccountType {
-  staff,
-  student,
-  parent,
-}
+enum UserAccountType { staff, student, parent }
 
 enum MembershipRole {
+  professor,
   staff,
   administrator,
   director,
@@ -47,11 +44,13 @@ class User {
     final membershipRoleValue = json['membership_role']?.toString();
     final membershipRole = membershipRoleValue != null
         ? (membershipRoleValue == 'super-admin'
-            ? MembershipRole.superAdmin
-            : MembershipRole.values.firstWhere(
-                (e) => e.name == membershipRoleValue,
-                orElse: () => MembershipRole.staff,
-              ))
+              ? MembershipRole.superAdmin
+              : (membershipRoleValue == 'professor'
+                    ? MembershipRole.professor
+                    : MembershipRole.values.firstWhere(
+                        (e) => e.name == membershipRoleValue,
+                        orElse: () => MembershipRole.staff,
+                      )))
         : null;
 
     return User(
@@ -69,10 +68,17 @@ class User {
   bool get isAdmin => membershipRole == MembershipRole.administrator;
   bool get isSuperAdmin => membershipRole == MembershipRole.superAdmin;
   bool get isTeacher => membershipRole == MembershipRole.teacher;
+  bool get isProfessor => membershipRole == MembershipRole.professor;
   bool get isStudent => userType == UserAccountType.student;
   bool get isParent => userType == UserAccountType.parent;
-  
-  bool get hasValidRole => isAdmin || isSuperAdmin || isTeacher || isStudent || isParent;
+
+  bool get hasValidRole =>
+      isAdmin ||
+      isSuperAdmin ||
+      isTeacher ||
+      isProfessor ||
+      isStudent ||
+      isParent;
 }
 
 class TenantContext {
@@ -81,8 +87,6 @@ class TenantContext {
   TenantContext({required this.institutionId});
 
   factory TenantContext.fromJson(Map<String, dynamic> json) {
-    return TenantContext(
-      institutionId: json['institution_id'] as int,
-    );
+    return TenantContext(institutionId: json['institution_id'] as int);
   }
 }

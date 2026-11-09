@@ -51,10 +51,26 @@ class _LoginScreenState extends State<LoginScreen> {
       if (targetRoute != null) {
         Get.offAllNamed(targetRoute);
       } else if (user != null) {
+        // User has data but role couldn't be determined - redirect to admin as fallback
         Get.offAllNamed('/admin/home');
       } else {
+        // Login succeeded but user data is incomplete - this shouldn't happen normally
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to determine user role')),
+          const SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Unable to determine user role',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 4),
+                Text('User data unavailable. Please try again.'),
+              ],
+            ),
+            backgroundColor: Colors.orange,
+          ),
         );
       }
     } else {
@@ -69,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (user.isSuperAdmin) return '/super-admin/home';
     if (user.isAdmin) return '/admin/home';
+    if (user.isProfessor) return '/professor/home';
     if (user.isTeacher) return '/professor/home';
     if (user.isStudent) return '/student/home';
     if (user.isParent) return '/parent/home';

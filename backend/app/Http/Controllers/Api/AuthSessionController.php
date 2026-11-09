@@ -61,10 +61,21 @@ class AuthSessionController extends Controller
     public function show(Request $request): JsonResponse
     {
         $user = $request->user();
+        
+        // First check for super-admin membership (platform-wide, not tied to active institution)
+        $superAdminMembership = InstitutionMembership::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->where('role', 'super-admin')
+            ->first();
+        
+        // Then check for regular active institution membership
         $membership = InstitutionMembership::where('user_id', $user->id)
             ->where('is_active', true)
             ->where('institution_id', $user->active_institution_id)
             ->first();
+
+        // Priority: super-admin role takes precedence, then active institution membership role
+        $membershipRole = $superAdminMembership?->role?->value ?? $membership?->role?->value;
 
         $userData = [
             'id' => $user->id,
@@ -74,7 +85,7 @@ class AuthSessionController extends Controller
             'user_type' => $user->user_type->value,
             'is_active' => $user->is_active,
             'active_institution_id' => $user->active_institution_id,
-            'membership_role' => $membership?->role?->value,
+            'membership_role' => $membershipRole,
         ];
 
         return response()->json(['data' => $userData]);

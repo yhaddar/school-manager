@@ -58,10 +58,10 @@ Route::prefix('v1')->group(function (): void {
         // Super Admin - Subscription Management
         Route::get('super-admin/subscriptions', [SubscriptionController::class, 'index']);
         Route::post('super-admin/subscriptions', [SubscriptionController::class, 'store']);
+        Route::get('super-admin/subscriptions/list', [SubscriptionController::class, 'listSubscriptions']);
         Route::get('super-admin/subscriptions/{plan}', [SubscriptionController::class, 'show']);
         Route::put('super-admin/subscriptions/{plan}', [SubscriptionController::class, 'update']);
         Route::delete('super-admin/subscriptions/{plan}', [SubscriptionController::class, 'destroy']);
-        Route::get('super-admin/subscriptions/list', [SubscriptionController::class, 'listSubscriptions']);
         
         // Super Admin - Institution Subscription Management
         Route::post('super-admin/institutions/{institution}/subscription', [SubscriptionController::class, 'assignToInstitution']);
@@ -71,11 +71,11 @@ Route::prefix('v1')->group(function (): void {
         // Super Admin - Support Access
         Route::post('super-admin/support/requests', [SupportController::class, 'store']);
         Route::get('super-admin/support/requests', [SupportController::class, 'index']);
-        Route::get('super-admin/support/requests/{request}', [SupportController::class, 'show']);
-        Route::post('super-admin/support/requests/{request}/approve', [SupportController::class, 'approve']);
-        Route::post('super-admin/support/requests/{request}/deny', [SupportController::class, 'deny']);
-        Route::post('super-admin/support/requests/{request}/access', [SupportController::class, 'grantAccess']);
-        Route::get('super-admin/support/requests/{request}/audit', [SupportController::class, 'audit']);
+        Route::get('super-admin/support/requests/{supportRequest}', [SupportController::class, 'show']);
+        Route::post('super-admin/support/requests/{supportRequest}/approve', [SupportController::class, 'approve']);
+        Route::post('super-admin/support/requests/{supportRequest}/deny', [SupportController::class, 'deny']);
+        Route::post('super-admin/support/requests/{supportRequest}/access', [SupportController::class, 'grantAccess']);
+        Route::get('super-admin/support/requests/{supportRequest}/audit', [SupportController::class, 'audit']);
         Route::post('super-admin/support/sessions/{session}/terminate', [SupportController::class, 'terminate']);
         
         // Super Admin - Tenant Lifecycle

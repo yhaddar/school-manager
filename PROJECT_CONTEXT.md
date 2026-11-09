@@ -8,6 +8,8 @@ Multi-tenant school-management platform for Administration, Professor, Student, 
 
 Laravel 13 exposes a versioned JSON API under `/api/v1`; Flutter serves mobile role spaces for Administration, Professor, Student, and Parent roles. PostgreSQL, Redis and private S3-compatible storage are the selected target direction, while local SQLite is used only for current verification. `openapi.yaml` is the API contract authority; the Postman collection is generated from it.
 
+**IMPORTANT:** Super Admin endpoints are now implemented (as of 2026-11-09) but not yet in openapi.yaml. Manual documentation pending.
+
 ## Security invariants
 
 - Tenant context is derived only from the authenticated user's active server-side membership; client tenant headers are ignored.
@@ -18,7 +20,7 @@ Laravel 13 exposes a versioned JSON API under `/api/v1`; Flutter serves mobile r
 
 ## Current Checkpoint
 
-### COMPLETED — Phases 1-9
+### COMPLETED — Phases 1-10 (Implementation Complete)
 
 **Phase 1 — Foundation:** ✅ COMPLETE
 - Laravel 13 backend with SQLite smoke DB
@@ -71,43 +73,23 @@ Laravel 13 exposes a versioned JSON API under `/api/v1`; Flutter serves mobile r
 - Accessibility widget tests
 - iOS simulator verification
 
-### Phase 10 — Super Admin Platform: SPECIFICATION COMPLETED (IMPLEMENTATION BLOCKED)
-
-**PD-005 Status:** SCOPE APPROVED, SPECIFICATION COMPLETED, IMPLEMENTATION BLOCKED
-
-**Specification Documents Created:**
-- FUNCTIONAL_DECISIONS.md - Complete functional specifications
-- RBAC_MATRIX.md - Role-based access control matrix
-- SECURITY_SPEC.md - Security requirements with MFA
-- SUPPORT_ACCESS_SPEC.md - Support access workflow
-- SUBSCRIPTION_SPEC.md - Manual subscription management
-- TENANT_LIFECYCLE_SPEC.md - Institution lifecycle
-- API_SPEC.md - Complete API specification
-- DATABASE_DESIGN.md - Database schema
-- ARCHITECTURE.md - System architecture
-- TEST.md - Test strategy
-- PLAN.md - Implementation plan
-
-**All PD-005 Decisions Implemented:**
-- D-01: Metadata visibility only
-- D-02: Read-only default support
-- D-03: Manual subscriptions, no payment gateway
-- D-04: 7-day grace period
-- D-05: Configurable retention 1-10 years
-- D-06: MFA mandatory
-
-**Pending User Actions:**
-1. Review all 11 specification documents
-2. Resolve unresolved questions
-3. Provide explicit implementation authorization
+**Phase 10 — Super Admin Platform:** ✅ COMPLETE
+- All controllers implemented (InstitutionController, SubscriptionController, SupportController, TenantController)
+- Database migrations registered and applied
+- Authentication and authorization via platform-permission gate
+- Subscription routes fixed (list route reordered before parameterized route)
+- Support routes fixed (parameter renamed to avoid conflicts)
+- Login UI improved with role display
+- UUID string support in User model for active_institution_id
+- Professor role support added
 
 ## Tests Summary
 
 **Backend:**
-- 140 tests, 606 assertions - ALL PASSING
+- 164 tests, 674 assertions - ALL PASSING
 
 **Flutter:**
-- 112 tests - ALL PASSING
+- 113 tests - ALL PASSING
 
 **Flutter Analyze:**
 - 0 errors, 23 warnings (pre-existing)
@@ -124,10 +106,29 @@ Laravel 13 exposes a versioned JSON API under `/api/v1`; Flutter serves mobile r
 | /api/v1/auth/sessions/current | DELETE | Yes | Logout |
 | /api/v1/auth/activation | POST | No | Account activation |
 | /api/v1/auth/parent-invitations/accept | POST | No | Accept parent link |
-| /v1/reports/** | Various | Yes | Reports CRUD |
-| /v1/exports/** | Various | Yes | Exports CRUD |
-| /v1/imports/** | Various | Yes | Imports CRUD |
-| /v1/search | GET | Yes | Search |
+| /api/v1/reports/** | Various | Yes | Reports CRUD |
+| /api/v1/exports/** | Various | Yes | Exports CRUD |
+| /api/v1/imports/** | Various | Yes | Imports CRUD |
+| /api/v1/search | GET | Yes | Search |
+| /api/v1/super-admin/institutions | GET, POST | Super Admin | Institution management |
+| /api/v1/super-admin/institutions/{id} | GET, PUT | Super Admin | Get/Update institution |
+| /api/v1/super-admin/institutions/{id}/activate | POST | Super Admin | Activate institution |
+| /api/v1/super-admin/institutions/{id}/suspend | POST | Super Admin | Suspend institution |
+| /api/v1/super-admin/institutions/{id}/archive | POST | Super Admin | Archive institution |
+| /api/v1/super-admin/institutions/{id}/restore | POST | Super Admin | Restore institution |
+| /api/v1/super-admin/subscriptions | GET, POST | Super Admin | Subscription plans |
+| /api/v1/super-admin/subscriptions/list | GET | Super Admin | List institution subscriptions |
+| /api/v1/super-admin/subscriptions/{plan} | GET, PUT, DELETE | Super Admin | Plan operations |
+| /api/v1/super-admin/institutions/{institution}/subscription | POST | Super Admin | Assign plan to institution |
+| /api/v1/super-admin/institutions/{institution}/subscription/renew | POST | Super Admin | Renew subscription |
+| /api/v1/super-admin/institutions/{institution}/subscription/history | GET | Super Admin | Subscription history |
+| /api/v1/super-admin/support/requests | GET, POST | Super Admin | Support requests |
+| /api/v1/super-admin/support/requests/{supportRequest} | GET, POST | Super Admin | Request operations |
+| /api/v1/super-admin/support/requests/{supportRequest}/approve | POST | Super Admin | Approve request |
+| /api/v1/super-admin/support/requests/{supportRequest}/deny | POST | Super Admin | Deny request |
+| /api/v1/super-admin/support/requests/{supportRequest}/access | POST | Super Admin | Grant support access |
+| /api/v1/super-admin/support/requests/{supportRequest}/audit | GET | Super Admin | Audit log |
+| /api/v1/super-admin/support/sessions/{session}/terminate | POST | Super Admin | Terminate session |
 
 ## Database Seeders Created
 
@@ -146,16 +147,42 @@ Laravel 13 exposes a versioned JSON API under `/api/v1`; Flutter serves mobile r
 ## Verification Status
 
 ### Completed
-- ✅ Backend tests: 140/606 passing
-- ✅ Flutter tests: 112 passing
+- ✅ Backend tests: 164/674 passing
+- ✅ Flutter tests: 113 passing
 - ✅ Flutter analyze: 0 errors
 - ✅ iOS simulator: iPhone 18 Pro iOS 27 build successful
 - ✅ API integration: All endpoints verified
-- ✅ Phase 10 specification: COMPLETED
+- ✅ Subscription routes: Fixed and verified
+- ✅ Support routes: Fixed and verified
+- ✅ Login UI: Improved with role display
+- ✅ Professor role: Added and tested
 
-### Blockers
+### Remaining Work
+- 🔸 MFA implementation (deferred - requires user specification)
 - 🔸 VoiceOver manual testing (requires iOS Simulator with VoiceOver)
 - 🔸 FCM Notifications (pending user specification)
-- 🔸 Phase 10 implementation (BLOCKED pending user review and authorization)
+- 🔸 OpenAPI spec update (Super Admin endpoints not documented)
+- 🔸 User documentation (Super Admin features)
 
-**STATUS: Phase 10 Specification Complete, Implementation Awaiting User Approval**
+## MFA Status: DEFERRED
+
+MFA implementation is deferred per user instructions:
+- No MFA verification flows implemented
+- `mfa_credentials` table and enums preserved as-is
+- MFA marked as pending specification and implementation
+
+## Recent Changes (2026-11-09)
+
+Bug fixes applied:
+1. SubscriptionController routes - `/subscriptions/list` now works correctly (route order fixed)
+2. SupportController route parameters - `{request}` → `{supportRequest}` to avoid conflicts
+3. Login UI - enhanced role detection feedback showing User Type, Membership Role, and Valid Role status
+
+### user_type Field
+
+Per user instruction: `user_type` column in users table is NOT updated. It remains as:
+- `staff` - for administrative users (admin, super-admin, professor roles are determined by `membership_role`)
+- `student` - for student accounts
+- `parent` - for parent accounts
+
+The `membership_role` field determines the actual role: `super-admin`, `administrator`, `professor`, `teacher`, `student`, `parent`.

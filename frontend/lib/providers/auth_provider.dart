@@ -106,4 +106,9 @@ class AuthProvider extends ChangeNotifier {
     await authService.logout();
     notifyListeners();
   }
+
+  /// Get the current authentication token
+  Future<String?> getToken() async {
+    return await authService.getToken();
+  }
 }

@@ -2,7 +2,11 @@ openapi: 3.1.0
 info:
   title: School Manager API
   version: 0.1.0
-  description: Foundation contract for account activation, opaque rotating mobile API sessions, and server-derived tenant context.
+  description: Foundation contract for account activation, opaque rotating mobile API sessions, and server-derived tenant context. All endpoints require authentication except where noted.
+
+security:
+  - bearerAuth: []
+
 paths:
   /api/v1/health:
     get:
@@ -10,6 +14,7 @@ paths:
       responses:
         '200':
           description: Service is available
+
   /api/v1/user:
     get:
       summary: Get the current authenticated user
@@ -24,6 +29,33 @@ paths:
                 $ref: '#/components/schemas/UserResponse'
         '401':
           description: Missing, expired, or revoked access token
+
+  /api/v1/tenant-context:
+    get:
+      summary: Read the authenticated user's server-derived institution context
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Active institution context
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [institution_id]
+                    properties:
+                      institution_id:
+                        type: string
+                        format: uuid
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: No active authorized membership
+
   /api/v1/auth/sessions:
     post:
       summary: Create an API session with email and password
@@ -44,6 +76,7 @@ paths:
           description: Invalid credentials or request validation failure
         '429':
           description: Login attempts are throttled
+
   /api/v1/auth/activation:
     post:
       summary: Activate a staff or student account with its temporary credential
@@ -64,6 +97,7 @@ paths:
           description: Activation credential is invalid, expired, used, or the new password is invalid
         '429':
           description: Activation attempts are throttled
+
   /api/v1/auth/sessions/refresh:
     post:
       summary: Rotate an API session refresh token
@@ -86,6 +120,7 @@ paths:
                 $ref: '#/components/schemas/TokenResponse'
         '401':
           description: Refresh token is invalid, expired, revoked, or reused
+
   /api/v1/auth/sessions/current:
     delete:
       summary: Revoke the current API session
@@ -96,30 +131,745 @@ paths:
           description: Session revoked
         '401':
           description: Missing, expired, or revoked access token
-  /api/v1/tenant-context:
+
+  /api/v1/super-admin/institutions:
     get:
-      summary: Read the authenticated user's server-derived institution context
+      summary: List all institutions (Super Admin only)
       security:
         - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, suspended, archived]
+          description: Filter by institution status
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by institution name
       responses:
         '200':
-          description: Active institution context
+          description: List of institutions
           content:
             application/json:
               schema:
                 type: object
-                required: [data]
                 properties:
                   data:
-                    type: object
-                    required: [institution_id]
-                    properties:
-                      institution_id:
-                        type: integer
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InstitutionResponse'
         '401':
           description: Missing, expired, or revoked access token
         '403':
-          description: No active authorized membership
+          description: Unauthorized - Super Admin role required
+    post:
+      summary: Create a new institution (Super Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInstitutionRequest'
+      responses:
+        '201':
+          description: Institution created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '422':
+          description: Validation error
+
+  /api/v1/super-admin/institutions/{id}:
+    get:
+      summary: Get institution details (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Institution details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution not found
+    put:
+      summary: Update institution (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInstitutionRequest'
+      responses:
+        '200':
+          description: Institution updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution not found
+        '422':
+          description: Validation error
+    delete:
+      summary: Archive institution (Super Admin only)
+      description: Archive institution by setting status to inactive. Prevents archiving if active memberships exist.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Institution archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution not found
+        '422':
+          description: Cannot archive institution with active memberships
+
+  /api/v1/super-admin/institutions/{id}/activate:
+    post:
+      summary: Activate institution (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Institution activated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution not found
+
+  /api/v1/super-admin/institutions/{id}/suspend:
+    post:
+      summary: Suspend institution (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Institution suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution not found
+
+  /api/v1/super-admin/institutions/{id}/reactivate:
+    post:
+      summary: Reactivate suspended institution (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Institution reactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution not found
+
+  /api/v1/super-admin/institutions/{id}/archive:
+    post:
+      summary: Archive institution (Super Admin only)
+      description: Archive institution by setting status to archived. Different from DELETE which sets to inactive.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Institution archived
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution not found
+
+  /api/v1/super-admin/institutions/{id}/restore:
+    post:
+      summary: Restore archived institution (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Institution restored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution not found
+
+  /api/v1/super-admin/subscriptions:
+    get:
+      summary: List active subscription plans (Super Admin only)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of subscription plans
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SubscriptionPlanResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+    post:
+      summary: Create a new subscription plan (Super Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubscriptionPlanRequest'
+      responses:
+        '201':
+          description: Subscription plan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionPlanResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '422':
+          description: Validation error
+
+  /api/v1/super-admin/subscriptions/list:
+    get:
+      summary: List all institution subscriptions (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, expired, cancelled, pending]
+          description: Filter by subscription status
+      responses:
+        '200':
+          description: Paginated list of institution subscriptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubscriptionList'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+
+  /api/v1/super-admin/subscriptions/{plan}:
+    get:
+      summary: Get subscription plan details (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: plan
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Subscription plan details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionPlanResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Plan not found
+    put:
+      summary: Update subscription plan (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: plan
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubscriptionPlanRequest'
+      responses:
+        '200':
+          description: Subscription plan updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionPlanResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Plan not found
+        '422':
+          description: Validation error
+    delete:
+      summary: Delete subscription plan (Super Admin only)
+      description: Cannot delete plan if assigned to institutions.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: plan
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Plan deleted
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Plan not found
+        '422':
+          description: Cannot delete plan assigned to institutions
+
+  /api/v1/super-admin/institutions/{institution}/subscription:
+    post:
+      summary: Assign subscription plan to institution (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: institution
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignSubscriptionRequest'
+      responses:
+        '201':
+          description: Subscription assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionSubscriptionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution or plan not found
+        '422':
+          description: Validation error
+
+  /api/v1/super-admin/institutions/{institution}/subscription/renew:
+    post:
+      summary: Renew institution's subscription (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: institution
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewSubscriptionRequest'
+      responses:
+        '200':
+          description: Subscription renewed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionSubscriptionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution or subscription not found
+        '422':
+          description: Validation error
+
+  /api/v1/super-admin/institutions/{institution}/subscription/history:
+    get:
+      summary: Get subscription history for institution (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: institution
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Subscription history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionHistoryResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Institution or subscription not found
+
+  /api/v1/super-admin/support/requests:
+    post:
+      summary: Create support request (Super Admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSupportRequestRequest'
+      responses:
+        '201':
+          description: Support request created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportRequestResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '422':
+          description: Validation error
+    get:
+      summary: List support requests (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, denied, resolved]
+          description: Filter by request status
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, urgent]
+          description: Filter by priority level
+        - name: institution_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by institution ID
+      responses:
+        '200':
+          description: Paginated list of support requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSupportRequestList'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+
+  /api/v1/super-admin/support/requests/{supportRequest}:
+    get:
+      summary: Get support request details (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supportRequest
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Support request details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportRequestResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Support request not found
+    post:
+      summary: Approve support request (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supportRequest
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Support request approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportRequestResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Support request not found
+
+  /api/v1/super-admin/support/requests/{supportRequest}/deny:
+    post:
+      summary: Deny support request (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supportRequest
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Support request denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportRequestResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Support request not found
+
+  /api/v1/super-admin/support/requests/{supportRequest}/access:
+    post:
+      summary: Grant support session access (Super Admin only)
+      description: Requires support request to be approved first. Creates a time-limited session for troubleshooting.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supportRequest
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Support session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportSessionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '422':
+          description: Cannot grant access - request must be approved first
+
+  /api/v1/super-admin/support/requests/{supportRequest}/audit:
+    get:
+      summary: Get support request audit log (Super Admin only)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: supportRequest
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        action:
+                          type: string
+                        user_id:
+                          type: integer
+                        timestamp:
+                          type: string
+                          format: date-time
+                        session_token:
+                          type: string
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Support request not found
+
+  /api/v1/super-admin/support/sessions/{session}/terminate:
+    post:
+      summary: Terminate support session (Super Admin only)
+      description: End a support session before its expiration time.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: session
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Session terminated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportSessionResponse'
+        '401':
+          description: Missing, expired, or revoked access token
+        '403':
+          description: Unauthorized - Super Admin role required
+        '404':
+          description: Session not found
+
   /api/v1/management/courses/{course}/teacher:
     post:
       summary: Assign a teacher to a course
@@ -149,12 +899,14 @@ paths:
           description: Forbidden - user lacks administrator privileges
         '404':
           description: Course or teacher not found
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: opaque
+
   schemas:
     UserResponse:
       type: object
@@ -170,23 +922,22 @@ components:
               type: string
             email:
               type: string
-              username:
-                type: string
+            username:
+              type: string
             user_type:
               type: string
               enum: [staff, student, parent]
             is_active:
               type: boolean
             active_institution_id:
-              type: integer
+              type: string
+              format: uuid
               nullable: true
             membership_role:
               type: string
-              enum: [staff, administrator, director, teacher, student, parent]
+              enum: [super-admin, administrator, director, professor, teacher, student, parent]
               nullable: true
-            user_id:
-              type: integer
-              description: User ID for token response
+
     LoginRequest:
       type: object
       required: [email, password]
@@ -197,6 +948,7 @@ components:
         password:
           type: string
           format: password
+
     AccountActivationRequest:
       type: object
       required: [username, temporary_password, password, password_confirmation]
@@ -213,6 +965,7 @@ components:
         password_confirmation:
           type: string
           format: password
+
     TokenResponse:
       type: object
       required: [data]
@@ -234,6 +987,7 @@ components:
             user_id:
               type: integer
               description: The user ID for client-side storage
+
     CourseTeacherAssignmentRequest:
       type: object
       required: [teacher_id]
@@ -241,6 +995,7 @@ components:
         teacher_id:
           type: integer
           description: The user ID of the teacher to assign
+
     CourseTeacherAssignmentResponse:
       type: object
       required: [data]
@@ -258,3 +1013,406 @@ components:
             teacher_name:
               type: string
               description: Teacher's name
+
+    InstitutionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, suspended, archived]
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+        archived_at:
+          type: string
+          format: date-time
+          nullable: true
+        member_count:
+          type: integer
+
+    CreateInstitutionRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+
+    UpdateInstitutionRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+
+    SubscriptionPlanResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        tier:
+          type: string
+          enum: [basic, professional, enterprise]
+        features:
+          type: array
+          items:
+            type: string
+        storage_limit_gb:
+          type: integer
+        user_limit:
+          type: integer
+          nullable: true
+        api_rate_limit:
+          type: integer
+          nullable: true
+        price_monthly:
+          type: number
+          format: decimal
+        price_yearly:
+          type: number
+          format: decimal
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: integer
+
+    CreateSubscriptionPlanRequest:
+      type: object
+      required: [name, tier]
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        tier:
+          type: string
+          enum: [basic, professional, enterprise]
+        features:
+          type: array
+          items:
+            type: string
+        storage_limit_gb:
+          type: integer
+          minimum: 0
+        user_limit:
+          type: integer
+          minimum: 1
+        api_rate_limit:
+          type: integer
+          minimum: 1
+        price_monthly:
+          type: number
+          minimum: 0
+        price_yearly:
+          type: number
+          minimum: 0
+
+    UpdateSubscriptionPlanRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        tier:
+          type: string
+          enum: [basic, professional, enterprise]
+        features:
+          type: array
+          items:
+            type: string
+        storage_limit_gb:
+          type: integer
+          minimum: 0
+        user_limit:
+          type: integer
+          minimum: 1
+        api_rate_limit:
+          type: integer
+          minimum: 1
+        price_monthly:
+          type: number
+          minimum: 0
+        price_yearly:
+          type: number
+          minimum: 0
+        is_active:
+          type: boolean
+
+    InstitutionSubscriptionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        institution_id:
+          type: string
+          format: uuid
+        plan_id:
+          type: integer
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        billing_cycle:
+          type: string
+          enum: [monthly, yearly]
+        status:
+          type: string
+          enum: [active, expired, cancelled, pending]
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        plan:
+          $ref: '#/components/schemas/SubscriptionPlanResponse'
+
+    AssignSubscriptionRequest:
+      type: object
+      required: [plan_id, start_date, end_date]
+      properties:
+        plan_id:
+          type: integer
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        billing_cycle:
+          type: string
+          enum: [monthly, yearly]
+
+    RenewSubscriptionRequest:
+      type: object
+      required: [new_end_date]
+      properties:
+        new_end_date:
+          type: string
+          format: date
+        notes:
+          type: string
+
+    SubscriptionHistoryResponse:
+      type: object
+      properties:
+        subscription:
+          $ref: '#/components/schemas/InstitutionSubscriptionResponse'
+        plan:
+          $ref: '#/components/schemas/SubscriptionPlanResponse'
+
+    PaginatedSubscriptionList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstitutionSubscriptionResponse'
+        links:
+          type: object
+          properties:
+            first:
+              type: string
+            last:
+              type: string
+            prev:
+              type: string
+              nullable: true
+            next:
+              type: string
+              nullable: true
+        meta:
+          type: object
+          properties:
+            current_page:
+              type: integer
+            first_page_url:
+              type: string
+            from:
+              type: integer
+            to:
+              type: integer
+            total:
+              type: integer
+
+    SupportRequestResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        institution_id:
+          type: string
+          format: uuid
+        requester_id:
+          type: integer
+        approver_id:
+          type: integer
+          nullable: true
+        subject:
+          type: string
+        description:
+          type: string
+          nullable: true
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+        status:
+          type: string
+          enum: [pending, approved, denied, resolved]
+        category:
+          type: string
+          nullable: true
+        requested_access:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+          nullable: true
+        approved_at:
+          type: string
+          format: date-time
+          nullable: true
+        denied_at:
+          type: string
+          format: date-time
+          nullable: true
+        resolved_at:
+          type: string
+          format: date-time
+          nullable: true
+        institution:
+          $ref: '#/components/schemas/InstitutionResponse'
+        requester:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            email:
+              type: string
+        approver:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            email:
+              type: string
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportSessionResponse'
+
+    CreateSupportRequestRequest:
+      type: object
+      required: [institution_id, subject]
+      properties:
+        institution_id:
+          type: string
+          format: uuid
+        subject:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        priority:
+          type: string
+          enum: [low, medium, high, urgent]
+        category:
+          type: string
+          maxLength: 100
+        requested_access:
+          type: array
+          items:
+            type: string
+        notes:
+          type: string
+
+    SupportSessionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        support_request_id:
+          type: integer
+        accessor_id:
+          type: integer
+        session_token:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum: [active, terminated]
+        actions_logged:
+          type: array
+          items:
+            type: string
+
+    PaginatedSupportRequestList:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportRequestResponse'
+        links:
+          type: object
+          properties:
+            first:
+              type: string
+            last:
+              type: string
+            prev:
+              type: string
+              nullable: true
+            next:
+              type: string
+              nullable: true
+        meta:
+          type: object
+          properties:
+            current_page:
+              type: integer
+            first_page_url:
+              type: string
+            from:
+              type: integer
+            to:
+              type: integer
+            total:
+              type: integer
